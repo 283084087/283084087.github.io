@@ -3,95 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>实时天气</title>
+    <title>北疆伊犁阿勒泰行程 | 9.26-10.5</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{
-            min-height:100vh;
-            background:linear-gradient(135deg,#4facfe,#00f2fe);
-            color:#fff;
-            padding:20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-        .container{
-            max-width:450px;
-            margin:0 auto;
-            background:rgba(255,255,255,0.15);
-            backdrop-filter:blur(10px);
-            border-radius:24px;
-            padding:30px;
-            box-shadow:0 8px 32px rgba(0,0,0,0.1);
+        body {
+            background-color: #E8F4FF;
+            padding: 24px 16px;
         }
-        .location{font-size:22px;margin-bottom:10px;}
-        .time{font-size:16px;opacity:0.9;margin-bottom:20px;}
-        .temp{font-size:72px;font-weight:bold;line-height:1;}
-        .weather-text{font-size:24px;margin:12px 0 30px;}
-        .info-row{
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:16px;
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
         }
-        .info-card{
-            background:rgba(255,255,255,0.12);
-            padding:16px;
-            border-radius:16px;
-            text-align:center;
+        .header-card {
+            background: linear-gradient(135deg, #50B8FE, #22A7F0);
+            border-radius: 24px;
+            padding: 32px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 30px #0077cc44;
+            margin-bottom:24px;
         }
-        .info-card .label{font-size:14px;opacity:0.8}
-        .info-card .val{font-size:20px;margin-top:6px;font-weight:bold}
-        .loading{text-align:center;padding:40px;font-size:18px;}
+        .header-card h1 {
+            font-size:34px;
+            margin-bottom:10px;
+        }
+        .header-card p {
+            font-size:18px;
+            opacity:0.9;
+        }
+        .day-card {
+            background: #fff;
+            border-radius:20px;
+            padding:24px;
+            margin-bottom:18px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+        .day-title {
+            font-size:22px;
+            font-weight:bold;
+            color:#227ccd;
+            border-left:5px solid #22a7f0;
+            padding-left:12px;
+            margin-bottom:16px;
+        }
+        .item {
+            margin-bottom:10px;
+            line-height:1.6;
+        }
+        .label {
+            font-weight:bold;
+            color:#333;
+        }
+        .yellow-tip {
+            background-color: #fff8b8;
+            padding:8px 10px;
+            border-radius:8px;
+            margin:8px 0;
+        }
+        .stay {
+            margin-top:12px;
+            color:#22a7f0;
+            font-weight:bold;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div id="wrap" class="loading">正在加载天气...</div>
-</div>
+    <div class="container">
+        <div class="header-card">
+            <h1>北疆环线行程</h1>
+            <p>9.26 - 10.05｜伊宁、赛里木湖、喀纳斯、禾木、那拉提</p>
+        </div>
 
-<script>
-const wrap = document.getElementById('wrap');
-// 更新时间
-function updateTime(){
-    const now = new Date();
-    const weekArr = ["周日","周一","周二","周三","周四","周五","周六"];
-    return `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${weekArr[now.getDay()]} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
-}
+        <div class="day-card">
+            <div class="day-title">周六 9.26｜宁波→伊宁</div>
+            <div class="item"><span class="label">交通：</span>9C6875 7:20-15:20，飞行8h，落地办入住</div>
+            <div class="item"><span class="label">行程：</span>伊宁→果子沟观景台（110km，1.5h）；停车场停车约30min，2条木栈道：往左拍雪山，往右走悬崖机位</div>
+            <div class="stay">🏨 住宿：伊宁｜推荐桔子/全季酒店</div>
+        </div>
 
-// 👉 修改这里城市，比如深圳是shenzhen，上海shanghai，北京beijing
-const city = "shenzhen";
-async function getWeather(){
-    try{
-        const res = await fetch(`https://wttr.in/${city}?format=j1`);
-        const data = await res.json();
-        const current = data.current_condition[0];
-        const area = data.nearest_area[0].areaName[0].value;
+        <div class="day-card">
+            <div class="day-title">周日 9.27｜伊宁 → 赛里木湖</div>
+            <div class="item"><span class="label">交通：</span>56km，50min</div>
+            <div class="item"><span class="label">环湖游玩（约6-8h）：</span>东门进全程环湖；松树头(徒步1-2h)、S弯(乳海之源)、克勒涌珠（天鹅）、点将台（全景）、亲水滩（戏水）、月亮湾（入口）</div>
+            <div class="stay">🏨 住宿：赛里木湖｜推荐桔子/亚朵/城际酒店湖景房</div>
+        </div>
 
-        const temp = current.temp_C;
-        const sky = current.weatherDesc[0].value;
-        const hum = current.humidity;
-        const wind = `${current.windspeedKmph} km/h`;
+        <div class="day-card">
+            <div class="day-title">周一 9.28｜奎屯 → 克拉玛依 → 布尔津</div>
+            <div class="item"><span class="label">交通：</span>奎屯320km(3.5h)克拉玛依；克拉玛依→魔鬼城246km(2h40min)；魔鬼城→布尔津215km(2h50min)</div>
+            <div class="item"><span class="label">行程：</span>中午13:00-14:00吃饭，魔鬼城打卡拍照30min；17:00前往布尔津，20:00晚餐</div>
+            <div class="stay">🏨 住宿：布尔津｜推荐星皇酒店</div>
+        </div>
 
-        wrap.innerHTML=`
-            <div class="location">📍 ${area}</div>
-            <div class="time" id="t">${updateTime()}</div>
-            <div class="temp">${temp}°C</div>
-            <div class="weather-text">${sky}</div>
-            <div class="info-row">
-                <div class="info-card">
-                    <div class="label">湿度</div>
-                    <div class="val">${hum}%</div>
-                </div>
-                <div class="info-card">
-                    <div class="label">风速</div>
-                    <div class="val">${wind}</div>
-                </div>
-            </div>
-        `;
-        setInterval(()=>{document.getElementById('t').innerText=updateTime()},1000);
-    }catch(e){
-        wrap.innerText="天气加载失败";
-        console.log(e);
-    }
-}
-getWeather();
-</script>
+        <div class="day-card">
+            <div class="day-title">周二 9.29｜布尔津 → 白哈巴 → 喀纳斯</div>
+            <div class="item"><span class="label">行程：</span>贸易特边境警务站、齐巴尔希力克村、白哈巴、中哈边境大峡谷；白哈巴游客中心换乘景交车</div>
+            <div class="yellow-tip">⚠️ 观鱼台：登1068级台阶，俯瞰湖全景&友谊峰，往返2-3h</div>
+            <div class="item">喀纳斯湖：湖边栈道漫步，游船80元/人，往返2-3h</div>
+            <div class="stay">🏨 住宿：喀纳斯｜推荐老/新村附近</div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-title">周三 9.30｜喀纳斯 → 白哈巴</div>
+            <div class="item"><span class="label">行程：</span>神仙湾（6-8点晨雾）、月亮湾、卧龙湾；三湾游玩4-6h</div>
+            <div class="yellow-tip">⚠️ 观鱼台：登1068级台阶，俯瞰湖全景&友谊峰，往返2-3h</div>
+            <div class="item">喀纳斯湖：湖边栈道漫步，游船80元/人，往返2-3h</div>
+            <div class="stay">🏨 住宿：白哈巴</div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-title">周四 10.1｜白哈巴 → 禾木</div>
+            <div class="item"><span class="label">交通：</span>白哈巴→禾木游客中心124km，3h；禾木内部区间车+公交游玩</div>
+            <div class="item"><span class="label">打卡点：</span>禾木桥、美丽峰、白桦林、百年老屋、美食街；日落观景台，日落建议19点到；日出观景台建议7:50前到</div>
+            <div class="stay">🏨 住宿：禾木｜图瓦·Tuvan度假民宿</div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-title">周五 10.2｜禾木 → 阿勒泰</div>
+            <div class="item"><span class="label">交通：</span>禾木→阿勒泰208km，3.5h，阿禾公路，沿途31个观景台</div>
+            <div class="item"><span class="label">沿途：</span>托勒海特、依特列石林、一通巴、野卡峡、乌希里克雪岭公园、大小东沟</div>
+            <div class="stay">🏨 住宿：阿勒泰｜推荐全季</div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-title">周六 10.3｜阿勒泰 → 乌尔禾 → 奎屯</div>
+            <div class="item"><span class="label">交通：</span>阿勒泰→乌尔禾326km(3.5h)；乌尔禾→白杨大峡谷30km；乌尔禾→艾里克湖51km；乌尔禾→奎屯227km(3.5h)</div>
+            <div class="item"><span class="label">行程：</span>午饭：领头羊半油城烧烤；白杨大峡谷自驾票100元，单线游玩约2h；艾里克湖拍照打卡约30min</div>
+            <div class="stay">🏨 住宿：奎屯｜推荐全季</div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-title">周日 10.4｜奎屯 → 唐布拉 → 那拉提</div>
+            <div class="item"><span class="label">行程：</span>乔尔玛、尼好服务站、仙女湖、百里画廊观景台、唐布拉草原、布隆沟、蜜蜂小镇；19:00前进西门，最高点看落日</div>
+            <div class="stay">🏨 住宿：那拉提｜推荐漠北格Grassland scenery</div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-title">周一 10.5｜那拉提</div>
+            <div class="item"><span class="label">行程：</span>天云台、天界台、游牧人家、空中草原；盘龙古道环线22km，40min</div>
+            <div class="item">【天界台】盘山步道登高望远；【游牧人家】骑马/越野车；【蛟龙出海】盘龙古道经典观景台；【卧牛谷】开阔山谷，森林牧场</div>
+            <div class="stay">🏨 住宿：那拉提/伊宁</div>
+        </div>
+
+    </div>
 </body>
 </html>
