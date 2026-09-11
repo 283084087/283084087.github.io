@@ -3,674 +3,241 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>新疆自驾·路况气象台</title>
+<title>北疆自驾行程｜天气+实时路况+路线地图</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<!-- Leaflet地图 -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary:'#0F4C81',
+        weatherCard:'#165B96',
+        warn:'#d94848',
+      },
+    }
+  }
+}
+</script>
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:system-ui, -apple-system, sans-serif;
-}
-body{
-  background:#0f1c29;
-  color:#ffffff;
-  padding:16px;
-}
-
-/* ========== 多地点天气卡片 样式 ========== */
-.place-weather-card{
-  background:#182433;
-  border-radius:16px;
-  overflow:hidden;
-  margin-bottom:16px;
-}
-.card-banner{
-  height:140px;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0.75), #182433), #345;
-}
-.place-name{
-  font-size:32px;
-  font-weight:bold;
-  margin-bottom:4px;
-}
-.place-desc{
-  font-size:14px;
-  opacity:0.85;
-}
-.weather-main-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 20px;
-}
-.weather-left{
-  display:flex;
-  gap:12px;
-  font-size:14px;
-  flex-wrap:wrap;
-  opacity:0.9;
-}
-.weather-right{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.temp-big{
-  font-size:44px;
-  font-weight:bold;
-}
-/* 7天横向预报 */
-.week-forecast{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:4px;
-  padding:0 10px 14px;
-  text-align:center;
-  font-size:13px;
-}
-.forecast-item .icon{
-  font-size:20px;
-  margin:4px 0;
-}
-.bottom-tip{
-  margin:0 20px 20px;
-  padding:8px 12px;
-  background:#289b49;
-  border-radius:8px;
-  font-size:14px;
-}
-
-/* ========== 新增：路段里程耗时卡片【匹配你截图样式】 ========== */
-.route-section-wrap{
-  margin:20px 0;
-}
-.route-section-title{
-  font-size:16px;
-  font-weight:bold;
-  margin-bottom:12px;
-}
-.route-grid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:12px;
-}
-.route-item-card{
-  background:#182433;
-  border-radius:14px;
-  padding:16px;
-}
-.route-name{
-  font-size:24px;
-  font-weight:500;
-  margin-bottom:8px;
-}
-.route-distance{
-  font-size:22px;
-  color:#40a9ff;
-  font-weight:bold;
-}
-@media(max-width:720px){
-  .route-grid{
-    grid-template-columns:1fr;
-  }
-}
-
-/* 顶部行程标题条 */
-.route-top-bar{
-  background:rgba(255,200,80,0.15);
-  color:#ffd060;
-  padding:10px 14px;
-  border-radius:10px;
-  font-size:14px;
-  margin-bottom:16px;
-  text-align:center;
-}
-
-/* 风险预警模块 红棕色卡片组 */
-.alert-wrap{
-  background:#993828;
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:14px;
-}
-.alert-title{
-  font-weight:bold;
-  font-size:16px;
-  margin-bottom:12px;
-}
-.alert-cards{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:10px;
-}
-.alert-card{
-  background:rgba(255,255,255,0.12);
-  border-radius:10px;
-  padding:12px;
-  font-size:14px;
-  line-height:1.4;
-}
-@media(max-width:720px){
-  .alert-cards{
-    grid-template-columns:1fr;
-  }
-}
-
-/* 黄色按钮 长按复制 */
-.yellow-btn{
-  background:#ffd033;
-  color:#111111;
-  font-weight:bold;
-  text-align:center;
-  padding:12px;
-  border-radius:10px;
-  margin:14px 0 8px;
-  user-select:all;
-}
-.yellow-tip{
-  font-size:13px;
-  opacity:0.85;
-  margin-bottom:24px;
-  line-height:1.4;
-}
-
-/* 每日行程 - 绿色时间轴（圆点+竖线） */
-.travel-title{
-  font-size:16px;
-  font-weight:bold;
-  margin-bottom:16px;
-}
-.timeline{
-  position:relative;
-  padding-left:28px;
-}
-.timeline::before{
-  content:"";
-  position:absolute;
-  left:8px;
-  top:0;
-  bottom:0;
-  width:2px;
-  background:#386e48;
-}
-.timeline-item{
-  position:relative;
-  margin-bottom:20px;
-}
-.timeline-item::before{
-  content:"";
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:#46c268;
-  position:absolute;
-  left:-24px;
-  top:4px;
-}
-.timeline-date{
-  font-weight:bold;
-  font-size:15px;
-  margin-bottom:4px;
-}
-.timeline-text{
-  font-size:14px;
-  opacity:0.9;
-  line-height:1.4;
-}
+.table-wrap{overflow-x:auto;}
+table{min-width:900px;}
+#map{width:100%;height:420px;border-radius:12px;}
+.weather-card{background: linear-gradient(145deg,#165B96,#0F4C81);color:#fff;}
+.notice-box{background:#fff4f4;border:1px solid #ffcccc;border-radius:10px;padding:12px;}
 </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800">
+<div class="max-w-7xl mx-auto p-3 md:p-6">
+  <header class="bg-primary text-white rounded-xl p-4 mb-6">
+    <h1 class="text-xl md:text-2xl font-bold"><i class="fa fa-car mr-2"></i>新疆自驾·路况气象台</h1>
+    <p class="opacity-90 text-sm mt-1">手机/电脑双端访问｜天气 · 实时路况地图 · 新疆路网公告 · 详细行程</p>
+  </header>
 
-<!-- 1.伊宁天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">伊宁</div>
-    <div class="place-desc">伊犁河谷，早晚温差大</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 24°/11°</span>
-      <span>💧30%</span>
-      <span>💨10 km/h</span>
-      <span>🌅07:20</span>
+  <!-- 🛑新疆路网公告面板（网页内，免跳转） -->
+  <section class="mb-6">
+    <div class="notice-box">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-lg font-semibold text-warn"><i class="fa fa-road mr-1"></i>新疆路网 - 重点路段管制公告</h2>
+        <button onclick="refreshRoadNotice()" class="bg-warn text-white px-3 py-1 rounded text-sm">🔄 刷新公告</button>
+      </div>
+      <div id="roadNotice">
+        <p class="text-sm text-gray-700">
+          <b>监控路段：</b>G30连霍高速、G217独库、阿禾公路、S21阿乌高速、布尔津-喀纳斯公路<br/>
+          <span class="text-gray-500">💡提示：阿禾公路、山区路段遇雨雪会临时交通管制；出行前务必核对新疆路网官方最新消息。</span>
+        </p>
+      </div>
     </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">☀️</span>
-      <div class="temp-big">23°</div>
-      <span>当前</span>
+  </section>
+
+  <!-- 🌤️ 沿途城市天气卡片 -->
+  <section class="mb-6">
+    <h2 class="text-lg font-semibold mb-3">🌤️ 沿途点位天气预报</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="weather-card p-3 rounded-lg">
+        <h3 class="font-bold">伊宁</h3>
+        <p class="text-sm">当前：25℃｜晴</p>
+        <p class="text-xs opacity-80">9.26抵达，昼夜温差大</p>
+      </div>
+      <div class="weather-card p-3 rounded-lg">
+        <h3 class="font-bold">赛里木湖</h3>
+        <p class="text-sm">当前：12℃｜晴</p>
+        <p class="text-xs opacity-80">9.27，湖边风大，注意保暖</p>
+      </div>
+      <div class="weather-card p-3 rounded-lg">
+        <h3 class="font-bold">奎屯</h3>
+        <p class="text-sm">当前：24℃｜晴</p>
+        <p class="text-xs opacity-80">9.28，戈壁路段横风</p>
+      </div>
+      <div class="weather-card p-3 rounded-lg">
+        <h3 class="font-bold">克拉玛依</h3>
+        <p class="text-sm">当前：27℃｜晴</p>
+        <p class="text-xs opacity-80">9.28，魔鬼城干燥炎热</p>
+      </div>
+      <div class="weather-card p-3 rounded-lg">
+        <h3 class="font-bold">布尔津</h3>
+        <p class="text-sm">当前：23℃｜晴</p>
+        <p class="text-xs opacity-80">9.28，傍晚降温快</p>
+      </div>
+      <div class="weather-card p-3 rounded-lg">
+        <h3 class="font-bold">喀纳斯</h3>
+        <p class="text-sm">当前：15℃｜晴</p>
+        <p class="text-xs opacity-80">9.29~9.30，山区早晚很冷</p>
+      </div>
+      <div class="weather-card p-3 rounded-lg">
+        <h3 class="font-bold">禾木</h3>
+        <p class="text-sm">当前：11℃｜晴</p>
+        <p class="text-xs opacity-80">10.1，木屋山区，备好厚外套</p>
+      </div>
+      <div class="weather-card p-3 rounded-lg">
+        <h3 class="font-bold">阿勒泰</h3>
+        <p class="text-sm">当前：21℃｜晴</p>
+        <p class="text-xs opacity-80">10.2，阿禾公路沿途风景</p>
+      </div>
     </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>10°24°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">⛅</div><div>11°23°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">☁️</div><div>9°21°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>8°20°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>8°19°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>7°17°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">🌧️</div><div>6°15°</div></div>
-  </div>
-  <div class="bottom-tip">✅ 本10天无降雪预报</div>
+  </section>
+
+  <!-- 🗺️带实时路况图层的交互式地图 -->
+  <section class="mb-6">
+    <h2 class="text-lg font-semibold mb-3">🗺️自驾路线地图（内置实时路况图层，红=拥堵，绿=畅通）</h2>
+    <div id="map"></div>
+    <p class="text-xs text-gray-500 mt-2">⚠️地图、路况图层需要网络加载；离线打开时，表格、天气、公告面板依然可用</p>
+  </section>
+
+  <!-- 📅完整行程表格 -->
+  <section class="bg-white rounded-xl shadow p-4">
+    <h2 class="text-lg font-semibold mb-3">📅详细行程清单（9.26-10.5）</h2>
+    <div class="table-wrap">
+      <table class="border-collapse w-full text-sm">
+        <thead>
+          <tr class="bg-slate-100">
+            <th class="border px-2 py-2">时间</th>
+            <th class="border px-2 py-2">城市</th>
+            <th class="border px-2 py-2">交通</th>
+            <th class="border px-2 py-2">行程</th>
+            <th class="border px-2 py-2">住宿</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="border px-2 py-2">周六 9.26</td>
+            <td class="border px-2 py-2">宁波→伊宁</td>
+            <td class="border px-2 py-2">9C6875 7:20-15:20，8h</td>
+            <td class="border px-2 py-2">办入住</td>
+            <td class="border px-2 py-2">住伊宁<br>推荐桔子/全季酒店</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-2">周日 9.27</td>
+            <td class="border px-2 py-2">伊宁→赛里木湖</td>
+            <td class="border px-2 py-2">110km，1.5h</td>
+            <td class="border px-2 py-2">停车场停车，约30min<br>2条环湖道：往左走拍雪山，往右走悬崖机位<br>顺时针环湖（约6-8h）<br>东门进→全程靠湖边<br>松树头（徒步1-2h）<br>S弯（乳海之源）<br>克勒涌珠（天鹅）<br>点将台（全景）<br>亲水滩（戏水）<br>月亮湾（入口）</td>
+            <td class="border px-2 py-2">住赛里木湖<br>推荐桔子/亚朵/城际酒店湖景房</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-2">周一 9.28</td>
+            <td class="border px-2 py-2">赛里木湖→奎屯→克拉玛依→布尔津</td>
+            <td class="border px-2 py-2">56km/50min →320km/3.5h →246km/2h40min →215km/2h50min</td>
+            <td class="border px-2 py-2">奎屯酒店入住，午饭13:00-14:00<br>魔鬼城打卡拍照30min，17:00<br>布尔津晚饭20:00</td>
+            <td class="border px-2 py-2">住布尔津<br>推荐星程酒店</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-2">周二 9.29</td>
+            <td class="border px-2 py-2">布尔津→白哈巴→喀纳斯</td>
+            <td class="border px-2 py-2">89km/1.5h →26km/50min →39km/1h →12km/20min<br>区间车换乘1h</td>
+            <td class="border px-2 py-2">贾登峪边境警务站<br>齐巴尔希力克村拍照30min，午饭<br>中哈边境大峡谷拍照30min<br>白哈巴游客中心<br>观鱼台（当天约）：景交车30min，登1068级台阶，俯瞰湖全景&友谊峰，往返2-3h<br>喀纳斯湖：湖边栈道漫步，游船80元/人往返2-3h</td>
+            <td class="border px-2 py-2">住喀纳斯<br>推荐老/新村附近</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-2">周三 9.30</td>
+            <td class="border px-2 py-2">喀纳斯→白哈巴</td>
+            <td class="border px-2 py-2">景交车20min</td>
+            <td class="border px-2 py-2">三湾（4-6h）：神仙湾6-8点晨雾漫水面；月亮湾徒步5min“S形河道”；卧龙湾湖心岛形似巨龙，观景台拍全景</td>
+            <td class="border px-2 py-2">住白哈巴</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-2">周四 10.1</td>
+            <td class="border px-2 py-2">白哈巴→禾木</td>
+            <td class="border px-2 py-2">124km，3h；区间车45min</td>
+            <td class="border px-2 py-2">禾木桥、河边拍照，白桦林、百年老屋打卡；日落观景台19点；日出观景台7:50前到</td>
+            <td class="border px-2 py-2">住禾木<br>图瓦·Tuvan度假民宿</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-2">周五 10.2</td>
+            <td class="border px-2 py-2">禾木→阿勒泰</td>
+            <td class="border px-2 py-2">208km，3.5h，阿禾公路</td>
+            <td class="border px-2 py-2">沿途31个景点：托勒海特、依特石林、一湾巴、乌希里克雪岭云杉公园</td>
+            <td class="border px-2 py-2">住阿勒泰<br>推荐全季</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-2">周六 10.3</td>
+            <td class="border px-2 py-2">阿勒泰→乌尔禾→奎屯</td>
+            <td class="border px-2 py-2">326km/3.5h，51km/35min</td>
+            <td class="border px-2 py-2">白杨河大峡谷，艾里克湖打卡拍照，约30min</td>
+            <td class="border px-2 py-2">住奎屯<br>推荐全季</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-2">周日 10.4</td>
+            <td class="border px-2 py-2">奎屯→唐布拉→那拉提</td>
+            <td class="border px-2 py-2">227km/2.5h，21km/18min</td>
+            <td class="border px-2 py-2">仙女湖、百里画廊、蜂蜜小镇，19点前到那拉提看落日</td>
+            <td class="border px-2 py-2">住那拉提<br>推荐漠北格lassland scenery</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-2">周一 10.5</td>
+            <td class="border px-2 py-2">那拉提</td>
+            <td class="border px-2 py-2">盘龙古道环线22km，40min</td>
+            <td class="border px-2 py-2">空中草原、天界台；盘龙古道，卧牛山，森林河谷</td>
+            <td class="border px-2 py-2">住那拉提/伊宁</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </div>
 
-<!-- 2.赛里木湖天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">赛里木湖</div>
-    <div class="place-desc">高海拔·环湖风大</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 17°/8°</span>
-      <span>💧 2%</span>
-      <span>💨 14 km/h</span>
-      <span>🌅 08:08</span>
-    </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">☀️</span>
-      <div class="temp-big">17°</div>
-      <span>当前</span>
-    </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>8° 17°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">⛅</div><div>9° 20°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>10° 20°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>12° 19°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>12° 18°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>11° 15°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">🌥️</div><div>8° 14°</div></div>
-  </div>
-  <div class="bottom-tip">✅ 本10天无降雪预报</div>
-</div>
+<script>
+// 初始化地图
+const map = L.map('map').setView([44.8, 84.8], 6);
+// 底图
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
 
-<!--3.奎屯天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">奎屯</div>
-    <div class="place-desc">G30/G3014交汇</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 29°/15°</span>
-      <span>💧 0%</span>
-      <span>💨 9 km/h</span>
-      <span>🌅 07:54</span>
-    </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">☀️</span>
-      <div class="temp-big">28°</div>
-      <span>当前</span>
-    </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>15° 29°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">☀️</div><div>18° 31°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">☁️</div><div>17° 33°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">☁️</div><div>22° 32°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">☀️</div><div>21° 34°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>20° 29°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">☁️</div><div>18° 27°</div></div>
-  </div>
-</div>
+// 高德实时路况图层（自动刷新红黄绿路况）
+const trafficTime = new Date().getTime();
+const trafficLayer = L.tileLayer('http://tm.amap.com/trafficengine/mapabc/traffictile?v=1.0&t=1&x={x}&y={y}&z={z}&t=' + trafficTime, {
+  maxZoom:18,
+  opacity:0.7
+}).addTo(map);
 
-<!--4.克拉玛依天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">克拉玛依</div>
-    <div class="place-desc">戈壁路段，横风多发</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 30°/16°</span>
-      <span>💧4%</span>
-      <span>💨22 km/h</span>
-      <span>🌅07:48</span>
-    </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">☀️</span>
-      <div class="temp-big">29°</div>
-      <span>当前</span>
-    </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>16°30°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">☀️</div><div>17°32°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">⛅</div><div>15°29°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">☁️</div><div>14°27°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">☀️</div><div>14°28°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>13°26°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">☁️</div><div>12°24°</div></div>
-  </div>
-</div>
+// 自驾路线点位（伊宁，赛湖，奎屯，克拉玛依，布尔津，喀纳斯，禾木，阿勒泰）
+const points = [
+  [43.92,81.27,"伊宁｜9.26 落地"],
+  [44.60,81.20,"赛里木湖｜9.27环湖"],
+  [44.42,84.90,"奎屯｜9.28中午"],
+  [45.62,85.12,"克拉玛依｜魔鬼城"],
+  [47.70,88.13,"布尔津｜9.28晚"],
+  [48.68,87.01,"喀纳斯｜9.29-30"],
+  [48.42,87.67,"禾木｜10.1"],
+  [47.85,88.12,"阿勒泰｜10.2"]
+];
+// 标记点
+points.forEach(p=>{
+  L.marker([p[0],p[1]]).addTo(map).bindPopup(`<b>${p[2]}</b>`);
+})
+// 绘制自驾红色路线
+const routeLine = L.polyline(points.map(p=>[p[0],p[1]]),{color:'red',weight:3}).addTo(map);
 
-<!--5.布尔津天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">布尔津</div>
-    <div class="place-desc">额尔齐斯河，昼夜温差极大</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 26°/9°</span>
-      <span>💧12%</span>
-      <span>💨11 km/h</span>
-      <span>🌅07:35</span>
-    </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">☀️</span>
-      <div class="temp-big">24°</div>
-      <span>当前</span>
-    </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>9°26°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">⛅</div><div>8°24°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">☁️</div><div>7°22°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>7°20°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>6°19°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>6°17°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">🌧️</div><div>5°15°</div></div>
-  </div>
-</div>
-
-<!--6.喀纳斯天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">喀纳斯</div>
-    <div class="place-desc">山区林区，低温易雨雪</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 19°/4°</span>
-      <span>💧35%</span>
-      <span>💨7 km/h</span>
-      <span>🌅07:22</span>
-    </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">⛅</span>
-      <div class="temp-big">16°</div>
-      <span>当前</span>
-    </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">⛅</div><div>4°19°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">☁️</div><div>3°17°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>2°14°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">🌧️</div><div>2°12°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>1°11°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>0°9°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">❄️</div><div>-1°7°</div></div>
-  </div>
-  <div class="bottom-tip">⚠️ 未来10天有降雪风险</div>
-</div>
-
-<!--7.白哈巴天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">白哈巴</div>
-    <div class="place-desc">西北第一村，气温更低</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 17°/2°</span>
-      <span>💧40%</span>
-      <span>💨6 km/h</span>
-      <span>🌅07:20</span>
-    </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">⛅</span>
-      <div class="temp-big">14°</div>
-      <span>当前</span>
-    </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">⛅</div><div>2°17°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">☁️</div><div>1°15°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>0°12°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">🌧️</div><div>-1°10°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>-2°9°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>-3°7°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">❄️</div><div>-4°5°</div></div>
-  </div>
-  <div class="bottom-tip">⚠️ 未来10天有降雪风险</div>
-</div>
-
-<!--8.禾木天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">禾木</div>
-    <div class="place-desc">山间村落，清晨易霜冻</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 18°/3°</span>
-      <span>💧38%</span>
-      <span>💨8 km/h</span>
-      <span>🌅07:24</span>
-    </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">⛅</span>
-      <div class="temp-big">15°</div>
-      <span>当前</span>
-    </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">⛅</div><div>3°18°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">☁️</div><div>2°16°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>1°13°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">🌧️</div><div>0°11°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>-1°10°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>-2°8°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">❄️</div><div>-3°6°</div></div>
-  </div>
-  <div class="bottom-tip">⚠️ 未来10天有降雪风险</div>
-</div>
-
-<!--9.阿勒泰天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">阿勒泰</div>
-    <div class="place-desc">阿勒泰市，阿禾公路起点</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 22°/6°</span>
-      <span>💧28%</span>
-      <span>💨9 km/h</span>
-      <span>🌅07:26</span>
-    </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">☀️</span>
-      <div class="temp-big">20°</div>
-      <span>当前</span>
-    </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>6°22°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">⛅</div><div>5°20°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">☁️</div><div>4°18°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>3°16°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>2°14°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>1°12°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">🌧️</div><div>0°10°</div></div>
-  </div>
-</div>
-
-<!--10.那拉提天气卡片 -->
-<div class="place-weather-card">
-  <div class="card-banner">
-    <div class="place-name">那拉提</div>
-    <div class="place-desc">空中草原，山区多变天气</div>
-  </div>
-  <div class="weather-main-row">
-    <div class="weather-left">
-      <span>今日 21°/7°</span>
-      <span>💧32%</span>
-      <span>💨12 km/h</span>
-      <span>🌅07:35</span>
-    </div>
-    <div class="weather-right">
-      <span style="font-size:32px;">⛅</span>
-      <div class="temp-big">19°</div>
-      <span>当前</span>
-    </div>
-  </div>
-  <div class="week-forecast">
-    <div class="forecast-item"><div>11(五)</div><div class="icon">⛅</div><div>7°21°</div></div>
-    <div class="forecast-item"><div>12(六)</div><div class="icon">☁️</div><div>6°19°</div></div>
-    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>5°17°</div></div>
-    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>4°16°</div></div>
-    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>4°15°</div></div>
-    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>3°13°</div></div>
-    <div class="forecast-item"><div>17(四)</div><div class="icon">🌧️</div><div>2°11°</div></div>
-  </div>
-</div>
-
-<!-- ========== 新增：路段里程耗时卡片组 ========== -->
-<div class="route-section-wrap">
-  <div class="route-section-title">🗺️ 分段里程与预估行车时间</div>
-  <div class="route-grid">
-    <div class="route-item-card">
-      <div class="route-name">1.伊宁→赛里木湖</div>
-      <div class="route-distance">≈150km · 2.0h（估）</div>
-    </div>
-    <div class="route-item-card">
-      <div class="route-name">2.赛里木湖→奎屯</div>
-      <div class="route-distance">≈240km · 3.0h（估）</div>
-    </div>
-    <div class="route-item-card">
-      <div class="route-name">3.奎屯→克拉玛依</div>
-      <div class="route-distance">≈150km · 2.0h（估）</div>
-    </div>
-    <div class="route-item-card">
-      <div class="route-name">4.克拉玛依→布尔津</div>
-      <div class="route-distance">≈320km · 4.0h（估）</div>
-    </div>
-    <div class="route-item-card">
-      <div class="route-name">5.布尔津→喀纳斯</div>
-      <div class="route-distance">≈140km · 3.0h（估）</div>
-    </div>
-    <div class="route-item-card">
-      <div class="route-name">6.喀纳斯→禾木</div>
-      <div class="route-distance">≈60km · 1.5h（估）</div>
-    </div>
-    <div class="route-item-card">
-      <div class="route-name">7.禾木→阿勒泰市</div>
-      <div class="route-distance">≈120km · 2.5h（估）</div>
-    </div>
-    <div class="route-item-card">
-      <div class="route-name">8.阿勒泰市→那拉提</div>
-      <div class="route-distance">≈580km ·7.0h（估）</div>
-    </div>
-    <div class="route-item-card">
-      <div class="route-name">9.那拉提→伊宁</div>
-      <div class="route-distance">≈260km ·4.0h（估）</div>
-    </div>
-    <div class="route-item-card">
-      <div class="route-name">10.喀纳斯→白哈巴</div>
-      <div class="route-distance">≈28km ·1.0h（估）</div>
-    </div>
-  </div>
-</div>
-
-<!-- 顶部行程总览标签 -->
-<div class="route-top-bar">
-伊宁 → 赛里木湖 → 奎屯 → 克拉玛依 → 布尔津 → 喀纳斯 → 白哈巴 → 禾木 → 阿勒泰 → 那拉提 → 伊宁
-</div>
-
-<!-- ⚠️重点路段风险预警 -->
-<div class="alert-wrap">
-  <div class="alert-title">⚠️重点路段风险预警 自驾路上重点留意</div>
-  <div class="alert-cards">
-    <div class="alert-card">
-      🛣️阿禾公路（禾木 ↔ 阿勒泰）<br><br>
-      秋季极易霜冻结冰、落石；傍晚、夜间尽量不要通行，遇到雨雪临时封闭概率高。
-    </div>
-    <div class="alert-card">
-      🌊赛里木湖 / G30果子沟路段<br><br>
-      大风，9月底可能突发初雪，随时临时交通管制。
-    </div>
-    <div class="alert-card">
-      ⛰️喀纳斯 ↔ 白哈巴山路<br><br>
-      弯道多、限速严格；雨雪天气容易临时封闭，白哈巴必须提前办好边防证。
-    </div>
-  </div>
-</div>
-
-<!-- 黄色复制按钮 -->
-<div class="yellow-btn">📱 查询实时阻断：微信搜【新疆路网】小程序</div>
-<div class="yellow-tip">
-💡 手机长按上面黄色文字，可以复制【新疆路网】，打开微信，粘贴搜索小程序，查看官方实时封路阻断信息；也可以收听新疆949交通广播。网页版存在防盗链403限制，推荐小程序。
-</div>
-
-<!-- 📅每日行程 时间轴 -->
-<div class="travel-title">📅 每日行程安排 9.26–10.5北疆环线</div>
-<div class="timeline">
-  <div class="timeline-item">
-    <div class="timeline-date">D1｜9.26 伊宁</div>
-    <div class="timeline-text">
-      当日备注：落地采购物资，采购零食饮用水、御寒衣物，检查车辆。
-    </div>
-  </div>
-  <div class="timeline-item">
-    <div class="timeline-date">D2｜9.27 赛里木湖</div>
-    <div class="timeline-text">
-      当日备注：风大，湖边多穿衣服；果子沟路段随时留意大风管制。
-    </div>
-  </div>
-  <div class="timeline-item">
-    <div class="timeline-date">D3｜9.28 奎屯→克拉玛依</div>
-    <div class="timeline-text">
-      当日备注：戈壁大风，注意横风；保持安全车速。
-    </div>
-  </div>
-  <div class="timeline-item">
-    <div class="timeline-date">D4｜9.29 布尔津 → 喀纳斯</div>
-    <div class="timeline-text">
-      当日备注：山路限速，进山前油箱加满。
-    </div>
-  </div>
-  <div class="timeline-item">
-    <div class="timeline-date">D5｜9.30 喀纳斯 → 白哈巴</div>
-    <div class="timeline-text">
-      当日备注：边防证必带；山区早晚温度很低。
-    </div>
-  </div>
-  <div class="timeline-item">
-    <div class="timeline-date">D6｜10.1 白哈巴 → 禾木</div>
-    <div class="timeline-text">
-      当日备注：沿途山路，落石风险；傍晚尽量不赶路。
-    </div>
-  </div>
-  <div class="timeline-item">
-    <div class="timeline-date">D7｜10.2 禾木 → 阿勒泰</div>
-    <div class="timeline-text">
-      当日备注：阿禾公路，易霜冻，优先白天通行。
-    </div>
-  </div>
-  <div class="timeline-item">
-    <div class="timeline-date">D8｜10.3 阿勒泰 → 奎屯</div>
-    <div class="timeline-text">
-      当日备注：长途行车，定时休息。
-    </div>
-  </div>
-  <div class="timeline-item">
-    <div class="timeline-date">D9｜10.4 奎屯 → 那拉提</div>
-    <div class="timeline-text">
-      当日备注：山区路段，注意区间测速。
-    </div>
-  </div>
-  <div class="timeline-item">
-    <div class="timeline-date">D10｜10.5 那拉提 → 伊宁</div>
-    <div class="timeline-text">
-      当日备注：返程，预留充足时间，避免夜间山路行驶。
-    </div>
-  </div>
-</div>
-
+// 刷新新疆路网公告函数
+function refreshRoadNotice(){
+  document.getElementById("roadNotice").innerHTML = `<p class="text-sm text-gray-700">
+  <b>✅已刷新：</b>请核对：阿禾公路、G217、G30、S21山区路段。<br/>
+  <span class="text-red-600">提示：山区道路一旦下雨/降雪，会临时封路管制；出行前务必打开新疆路网小程序确认官方通知。</span></p>`;
+  alert("✅公告面板已刷新，请核对新疆路网最新管制信息！");
+}
+</script>
 </body>
 </html>
