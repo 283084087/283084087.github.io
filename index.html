@@ -1,78 +1,222 @@
-<!-- ========== 北疆重点路段风险预警板块 ========== -->
-<div class="section">
-  <div class="section-title">
-    ⚠️ 重点路段风险预警
-    <span class="sub">自驾路上重点留意</span>
-  </div>
-  <div class="route-item alert">
-    <strong>🥶 阿禾公路（禾木 ↔ 阿勒泰）</strong><br>
-    秋季极易霜冻结冰、落石；傍晚、夜间尽量不要通行，遇到雨雪临时封闭概率高。
-  </div>
-  <div class="route-item alert" style="margin-top:12px;">
-    <strong>🌬️ 赛里木湖 / G30果子沟路段</strong><br>
-    大风，9月底可能突发初雪，随时临时交通管制。
-  </div>
-  <div class="route-item alert" style="margin-top:12px;">
-    <strong>⛰️ 喀纳斯 ↔ 白哈巴山路</strong><br>
-    弯道多、限速严格；雨雪天气容易临时封闭，白哈巴必须提前办好边防证。
-  </div>
-  <div style="margin-top:16px;text-align:center;">
-    <div class="btn-warning" style="user-select:all;">📱 查询实时阻断：微信搜【新疆路网】小程序</div>
-  </div>
-  <div class="route-note" style="margin-top:12px;">
-    💡 <b>手机长按上面黄色文字，可以复制【新疆路网】</b>，打开微信，粘贴搜索小程序，查看官方实时封路阻断信息；也可以收听新疆949交通广播。网页版存在防盗链403限制，推荐小程序。
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新疆自驾·路况气象台</title>
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:system-ui, -apple-system, sans-serif;
+}
+body{
+  background:#0f1c29;
+  color:#ffffff;
+  padding:16px;
+}
+
+/* 顶部行程标题条 */
+.route-top-bar{
+  background:rgba(255,200,80,0.15);
+  color:#ffd060;
+  padding:10px 14px;
+  border-radius:10px;
+  font-size:14px;
+  margin-bottom:16px;
+  text-align:center;
+}
+
+/* 风险预警模块 红棕色卡片组 */
+.alert-wrap{
+  background:#993828;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:14px;
+}
+.alert-title{
+  font-weight:bold;
+  font-size:16px;
+  margin-bottom:12px;
+}
+.alert-cards{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+}
+.alert-card{
+  background:rgba(255,255,255,0.12);
+  border-radius:10px;
+  padding:12px;
+  font-size:14px;
+  line-height:1.4;
+}
+@media(max-width:720px){
+  .alert-cards{
+    grid-template-columns:1fr;
+  }
+}
+
+/* 黄色按钮 长按复制 */
+.yellow-btn{
+  background:#ffd033;
+  color:#111111;
+  font-weight:bold;
+  text-align:center;
+  padding:12px;
+  border-radius:10px;
+  margin:14px 0 8px;
+  user-select:all;
+}
+.yellow-tip{
+  font-size:13px;
+  opacity:0.85;
+  margin-bottom:24px;
+  line-height:1.4;
+}
+
+/* 每日行程 - 绿色时间轴（圆点+竖线） */
+.travel-title{
+  font-size:16px;
+  font-weight:bold;
+  margin-bottom:16px;
+}
+.timeline{
+  position:relative;
+  padding-left:28px;
+}
+.timeline::before{
+  content:"";
+  position:absolute;
+  left:8px;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:#386e48;
+}
+.timeline-item{
+  position:relative;
+  margin-bottom:20px;
+}
+.timeline-item::before{
+  content:"";
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:#46c268;
+  position:absolute;
+  left:-24px;
+  top:4px;
+}
+.timeline-date{
+  font-weight:bold;
+  font-size:15px;
+  margin-bottom:4px;
+}
+.timeline-text{
+  font-size:14px;
+  opacity:0.9;
+  line-height:1.4;
+}
+</style>
+</head>
+<body>
+
+<!-- 顶部行程总览标签 -->
+<div class="route-top-bar">
+伊宁 → 赛里木湖 → 奎屯 → 克拉玛依 → 布尔津 → 喀纳斯 → 白哈巴 → 禾木 → 阿勒泰 → 那拉提 → 伊宁
+</div>
+
+<!-- ⚠️重点路段风险预警 -->
+<div class="alert-wrap">
+  <div class="alert-title">⚠️重点路段风险预警 自驾路上重点留意</div>
+  <div class="alert-cards">
+    <div class="alert-card">
+      🛣️阿禾公路（禾木 ↔ 阿勒泰）<br><br>
+      秋季极易霜冻结冰、落石；傍晚、夜间尽量不要通行，遇到雨雪临时封闭概率高。
+    </div>
+    <div class="alert-card">
+      🌊赛里木湖 / G30果子沟路段<br><br>
+      大风，9月底可能突发初雪，随时临时交通管制。
+    </div>
+    <div class="alert-card">
+      ⛰️喀纳斯 ↔ 白哈巴山路<br><br>
+      弯道多、限速严格；雨雪天气容易临时封闭，白哈巴必须提前办好边防证。
+    </div>
   </div>
 </div>
 
-<!-- ========== 📅每日行程安排板块（新增） ========== -->
-<div class="section">
-  <div class="section-title">
-    📅 每日行程安排
-    <span class="sub">9.26–10.5北疆环线</span>
-  </div>
-  <div class="route-grid">
-    <div class="route-item">
-      <strong>D1｜9.26 伊宁</strong><br>
+<!-- 黄色复制按钮 -->
+<div class="yellow-btn">📱 查询实时阻断：微信搜【新疆路网】小程序</div>
+<div class="yellow-tip">
+💡 手机长按上面黄色文字，可以复制【新疆路网】，打开微信，粘贴搜索小程序，查看官方实时封路阻断信息；也可以收听新疆949交通广播。网页版存在防盗链403限制，推荐小程序。
+</div>
+
+<!-- 📅每日行程 时间轴 -->
+<div class="travel-title">📅 每日行程安排 9.26–10.5北疆环线</div>
+<div class="timeline">
+  <div class="timeline-item">
+    <div class="timeline-date">D1｜9.26 伊宁</div>
+    <div class="timeline-text">
       当日备注：落地采购物资，采购零食饮用水、御寒衣物，检查车辆。
     </div>
-    <div class="route-item">
-      <strong>D2｜9.27 赛里木湖</strong><br>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-date">D2｜9.27 赛里木湖</div>
+    <div class="timeline-text">
       当日备注：风大，湖边多穿衣服；果子沟路段随时留意大风管制。
     </div>
-    <div class="route-item">
-      <strong>D3｜9.28 奎屯→克拉玛依</strong><br>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-date">D3｜9.28 奎屯→克拉玛依</div>
+    <div class="timeline-text">
       当日备注：戈壁大风，注意横风；保持安全车速。
     </div>
-    <div class="route-item">
-      <strong>D4｜9.29 布尔津 → 喀纳斯</strong><br>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-date">D4｜9.29 布尔津 → 喀纳斯</div>
+    <div class="timeline-text">
       当日备注：山路限速，进山前油箱加满。
     </div>
-    <div class="route-item">
-      <strong>D5｜9.30 喀纳斯 → 白哈巴</strong><br>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-date">D5｜9.30 喀纳斯 → 白哈巴</div>
+    <div class="timeline-text">
       当日备注：边防证必带；山区早晚温度很低。
     </div>
-    <div class="route-item">
-      <strong>D6｜10.1 白哈巴 → 禾木</strong><br>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-date">D6｜10.1 白哈巴 → 禾木</div>
+    <div class="timeline-text">
       当日备注：沿途山路，落石风险；傍晚尽量不赶路。
     </div>
-    <div class="route-item">
-      <strong>D7｜10.2 禾木 → 阿勒泰</strong><br>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-date">D7｜10.2 禾木 → 阿勒泰</div>
+    <div class="timeline-text">
       当日备注：阿禾公路，易霜冻，优先白天通行。
     </div>
-    <div class="route-item">
-      <strong>D8｜10.3 阿勒泰 → 奎屯</strong><br>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-date">D8｜10.3 阿勒泰 → 奎屯</div>
+    <div class="timeline-text">
       当日备注：长途行车，定时休息。
     </div>
-    <div class="route-item">
-      <strong>D9｜10.4 奎屯 → 那拉提</strong><br>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-date">D9｜10.4 奎屯 → 那拉提</div>
+    <div class="timeline-text">
       当日备注：山区路段，注意区间测速。
     </div>
-    <div class="route-item">
-      <strong>D10｜10.5 那拉提 → 伊宁</strong><br>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-date">D10｜10.5 那拉提 → 伊宁</div>
+    <div class="timeline-text">
       当日备注：返程，预留充足时间，避免夜间山路行驶。
     </div>
   </div>
-  <div class="route-note">
-    行程仅作规划参考，雨雪天气、道路管制可随时调整；山区尽量避免夜间开车。
-  </div>
 </div>
+
+</body>
+</html>
