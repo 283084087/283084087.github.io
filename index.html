@@ -17,7 +17,9 @@ tailwind.config = {
         subblue: "#1a4b8c",
         warn: "#d97706",
         ok: "#16a34a",
-        danger: "#d94848"
+        danger: "#d94848",
+        cardDark: "#111827",
+        cardBg: "#1f2937"
       }
     }
   }
@@ -30,7 +32,7 @@ tailwind.config = {
       "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   }
 
-  /* 顶部蓝色横幅，对标长图 */
+  /* 顶部蓝色横幅 */
   .top-banner {
     background: linear-gradient(180deg, #0F3460 0%, #1a4b8c 100%);
     color: #fff;
@@ -47,25 +49,66 @@ tailwind.config = {
     box-shadow: 0 2px 8px rgba(15, 52, 96, 0.06);
   }
 
-  /* 长图里的深色天气卡片 */
+  /* ✅ 截图同款深色天气卡片 */
   .weather-card {
-    background: linear-gradient(145deg, #0f172a, #1e293b);
-    color: #fff;
+    background-color: #111827;
     border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 12px;
-    position: relative;
-    overflow: hidden;
+    padding: 18px;
+    margin-bottom: 14px;
+    color: #fff;
   }
-
-  .weather-card .city-tag {
-    position: absolute;
-    right: 12px;
-    top: 12px;
-    background: rgba(255, 255, 255, 0.12);
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
+  .weather-card-subtitle {
+    color:#9ca3af;
+    font-size:14px;
+    margin-bottom:12px;
+  }
+  .today-row {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .today-left{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .today-right{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:32px;
+    font-weight:bold;
+  }
+  .forecast-scroll{
+    overflow-x:auto;
+    display:flex;
+    gap:14px;
+    padding:4px 0 10px;
+    margin-bottom:12px;
+  }
+  .forecast-item{
+    min-width:52px;
+    text-align:center;
+    flex-shrink:0;
+  }
+  .tag-safe{
+    display:inline-block;
+    background:#166534;
+    color:#86efac;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:13px;
+  }
+  .tag-warning{
+    display:inline-block;
+    background:#713f12;
+    color:#fcd34d;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:13px;
   }
 
   /* 道路状态标签 */
@@ -87,54 +130,6 @@ tailwind.config = {
     height: 420px;
     border-radius: 14px;
     background: #e5e7eb;
-  }
-
-  /* 弹窗遮罩 */
-  .modal-mask {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 999;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-  }
-  .modal-mask.active {
-    display: flex;
-  }
-  .modal-box {
-    width: 100%;
-    max-width: 960px;
-    height: 86vh;
-    background: #fff;
-    border-radius: 14px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: #0F3460;
-    color: #fff;
-  }
-  .modal-body {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-  }
-  .modal-body iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-  }
-  .modal-fallback {
-    padding: 16px;
-    text-align: center;
-    color: #374151;
   }
 
   /* 列表行 */
@@ -193,11 +188,12 @@ tailwind.config = {
     </div>
 
     <div class="grid grid-cols-2 gap-2 mt-4">
-      <button onclick="openXinjiangRoad()" class="bg-white text-primary font-semibold py-2 rounded-lg text-sm">
-        <i class="fa fa-road mr-1"></i> 新疆路网
-      </button>
+      <!-- 新疆路网：直接新开标签页跳转，无弹窗iframe -->
+      <a href="https://cxfw.jtyst.xinjiang.gov.cn/" target="_blank" class="bg-white text-primary font-semibold py-2 rounded-lg text-sm text-center">
+        <i class="fa fa-road mr-1"></i> 新疆路网官网
+      </a>
       <button onclick="refreshAll()" class="bg-white/15 border border-white/30 text-white py-2 rounded-lg text-sm">
-        <i class="fa fa-refresh mr-1"></i> 刷新数据
+        <i class="fa fa-refresh mr-1"></i> 刷新页面
       </button>
     </div>
 
@@ -283,110 +279,540 @@ tailwind.config = {
     </div>
   </div>
 
-  <!-- ===================== 沿途点位7天天气预报 ===================== -->
+  <!-- ===================== 沿途点位天气预报【截图同款深色卡片】 ===================== -->
   <div class="section">
     <h2 class="text-lg font-bold text-primary mb-3">
       <i class="fa fa-cloud mr-1"></i> 沿途点位近7天天气预报
     </h2>
 
+    <!-- 伊宁 -->
     <div class="weather-card">
-      <span class="city-tag">起点</span>
-      <h3 class="text-xl font-bold">伊宁</h3>
-      <p class="text-sm opacity-80">伊犁河谷｜行程起点</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：晴转多云，气温 10℃ ~ 27℃</div>
-        <div class="text-green-300 mt-1">✅ 整体平稳，适合出发</div>
+      <h3 class="text-2xl font-bold">伊宁</h3>
+      <div class="weather-card-subtitle">伊犁河谷｜行程起点</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">27°</span>/<span class="text-blue-300">10°</span></span>
+          <span>💧3%</span>
+          <span>🌬️12 km/h</span>
+          <span>🌅07:32 🌇20:15</span>
+        </div>
+        <div class="today-right">☀️ 24°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>☀️</div>
+          <div>10°/27°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>☀️</div>
+          <div>11°/28°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>⛅</div>
+          <div>12°/26°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>🌧️</div>
+          <div>11°/24°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>⛅</div>
+          <div>10°/25°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>☀️</div>
+          <div>12°/27°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>⛅</div>
+          <div>13°/26°</div>
+        </div>
+      </div>
+      <div class="tag-safe">✅ 本10天无降雪预报</div>
     </div>
 
+    <!-- 唐布拉 -->
     <div class="weather-card">
-      <span class="city-tag">独库公路</span>
-      <h3 class="text-xl font-bold">唐布拉</h3>
-      <p class="text-sm opacity-80">百里画廊｜高海拔山区</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：多云为主，气温 5℃ ~ 21℃</div>
-        <div class="text-amber-300 mt-1">⚠️ 山区温差大，留意阵雪</div>
+      <h3 class="text-2xl font-bold">唐布拉</h3>
+      <div class="weather-card-subtitle">百里画廊｜高海拔山区｜独库公路</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">21°</span>/<span class="text-blue-300">5°</span></span>
+          <span>💧8%</span>
+          <span>🌬️10 km/h</span>
+          <span>🌅07:38 🌇20:08</span>
+        </div>
+        <div class="today-right">⛅ 14°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>⛅</div>
+          <div>5°/21°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>🌧️</div>
+          <div>4°/19°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>⛅</div>
+          <div>6°/20°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>⛅</div>
+          <div>5°/18°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>☀️</div>
+          <div>4°/19°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>⛅</div>
+          <div>6°/20°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>🌧️</div>
+          <div>5°/17°</div>
+        </div>
+      </div>
+      <div class="tag-warning">⚠️ 山区高海拔，留意阵雪降温</div>
     </div>
 
+    <!-- 那拉提 -->
     <div class="weather-card">
-      <span class="city-tag">独库公路</span>
-      <h3 class="text-xl font-bold">那拉提草原</h3>
-      <p class="text-sm opacity-80">空中草原｜独库公路重要节点</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：晴间多云，气温 7℃ ~ 23℃</div>
-        <div class="text-amber-300 mt-1">⚠️ 午后易变天，带厚外套</div>
+      <h3 class="text-2xl font-bold">那拉提草原</h3>
+      <div class="weather-card-subtitle">空中草原｜独库公路重要节点</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">23°</span>/<span class="text-blue-300">7°</span></span>
+          <span>💧6%</span>
+          <span>🌬️11 km/h</span>
+          <span>🌅07:36 🌇20:10</span>
+        </div>
+        <div class="today-right">☀️ 15°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>☀️</div>
+          <div>7°/23°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>⛅</div>
+          <div>8°/22°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>🌧️</div>
+          <div>6°/20°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>⛅</div>
+          <div>7°/21°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>☀️</div>
+          <div>8°/22°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>⛅</div>
+          <div>7°/23°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>🌧️</div>
+          <div>6°/21°</div>
+        </div>
+      </div>
+      <div class="tag-warning">⚠️ 午后天气多变，备好厚外套</div>
     </div>
 
+    <!-- 赛里木湖 -->
     <div class="weather-card">
-      <span class="city-tag">湖区</span>
-      <h3 class="text-xl font-bold">赛里木湖</h3>
-      <p class="text-sm opacity-80">高山湖泊｜环湖公路</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：晴到多云，气温 6℃ ~ 19℃</div>
-        <div class="text-amber-300 mt-1">⚠️ 湖边风大，注意保暖</div>
+      <h3 class="text-2xl font-bold">赛里木湖</h3>
+      <div class="weather-card-subtitle">高山湖泊｜环湖公路，湖边大风</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">19°</span>/<span class="text-blue-300">6°</span></span>
+          <span>💧5%</span>
+          <span>🌬️18 km/h</span>
+          <span>🌅07:40 🌇20:06</span>
+        </div>
+        <div class="today-right">☀️ 11°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>☀️</div>
+          <div>6°/19°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>⛅</div>
+          <div>7°/18°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>⛅</div>
+          <div>5°/17°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>🌧️</div>
+          <div>4°/16°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>⛅</div>
+          <div>5°/17°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>☀️</div>
+          <div>6°/18°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>⛅</div>
+          <div>7°/17°</div>
+        </div>
+      </div>
+      <div class="tag-warning">⚠️ 湖区风力大，注意防风保暖</div>
     </div>
 
+    <!-- 奎屯 -->
     <div class="weather-card">
-      <span class="city-tag">交通枢纽</span>
-      <h3 class="text-xl font-bold">奎屯</h3>
-      <p class="text-sm opacity-80">G30/G3014交汇</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：晴为主，气温 14℃ ~ 31℃</div>
-        <div class="text-green-300 mt-1">✅ 整体平稳</div>
+      <h3 class="text-2xl font-bold">奎屯</h3>
+      <div class="weather-card-subtitle">G30/G3014交通枢纽</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">31°</span>/<span class="text-blue-300">14°</span></span>
+          <span>💧2%</span>
+          <span>🌬️9 km/h</span>
+          <span>🌅07:42 🌇20:04</span>
+        </div>
+        <div class="today-right">☀️ 23°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>☀️</div>
+          <div>14°/31°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>☀️</div>
+          <div>15°/32°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>⛅</div>
+          <div>14°/30°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>☀️</div>
+          <div>13°/29°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>⛅</div>
+          <div>14°/30°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>☀️</div>
+          <div>15°/31°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>⛅</div>
+          <div>14°/30°</div>
+        </div>
+      </div>
+      <div class="tag-safe">✅ 本10天无降雪预报</div>
     </div>
 
+    <!-- 克拉玛依 -->
     <div class="weather-card">
-      <span class="city-tag">戈壁</span>
-      <h3 class="text-xl font-bold">克拉玛依</h3>
-      <p class="text-sm opacity-80">油田区｜戈壁风区</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：晴，气温 18℃ ~ 32℃</div>
-        <div class="text-green-300 mt-1">✅ 整体平稳</div>
+      <h3 class="text-2xl font-bold">克拉玛依</h3>
+      <div class="weather-card-subtitle">油田戈壁｜风区路段</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">32°</span>/<span class="text-blue-300">18°</span></span>
+          <span>💧1%</span>
+          <span>🌬️15 km/h</span>
+          <span>🌅07:48 🌇19:58</span>
+        </div>
+        <div class="today-right">☀️ 27°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>☀️</div>
+          <div>18°/32°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>☀️</div>
+          <div>19°/33°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>⛅</div>
+          <div>17°/31°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>☀️</div>
+          <div>18°/30°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>⛅</div>
+          <div>19°/31°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>☀️</div>
+          <div>18°/32°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>⛅</div>
+          <div>17°/30°</div>
+        </div>
+      </div>
+      <div class="tag-safe">✅ 本10天无降雪预报</div>
     </div>
 
+    <!-- 布尔津 -->
     <div class="weather-card">
-      <span class="city-tag">门户</span>
-      <h3 class="text-xl font-bold">布尔津</h3>
-      <p class="text-sm opacity-80">前往喀纳斯门户</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：多云，气温 11℃ ~ 28℃</div>
-        <div class="text-amber-300 mt-1">⚠️ 夜间降温明显</div>
+      <h3 class="text-2xl font-bold">布尔津</h3>
+      <div class="weather-card-subtitle">去往喀纳斯、禾木门户</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">28°</span>/<span class="text-blue-300">11°</span></span>
+          <span>💧4%</span>
+          <span>🌬️10 km/h</span>
+          <span>🌅07:55 🌇19:50</span>
+        </div>
+        <div class="today-right">⛅ 20°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>⛅</div>
+          <div>11°/28°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>☀️</div>
+          <div>12°/29°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>⛅</div>
+          <div>10°/27°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>🌧️</div>
+          <div>9°/25°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>⛅</div>
+          <div>10°/26°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>☀️</div>
+          <div>11°/27°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>⛅</div>
+          <div>12°/28°</div>
+        </div>
+      </div>
+      <div class="tag-warning">⚠️ 昼夜温差巨大，夜间降温明显</div>
     </div>
 
+    <!-- 喀纳斯 -->
     <div class="weather-card">
-      <span class="city-tag">景区</span>
-      <h3 class="text-xl font-bold">喀纳斯</h3>
-      <p class="text-sm opacity-80">喀纳斯湖｜山区景区</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：多云转晴，气温 3℃ ~ 17℃</div>
-        <div class="text-amber-300 mt-1">⚠️ 山区低温，备好厚衣</div>
+      <h3 class="text-2xl font-bold">喀纳斯</h3>
+      <div class="weather-card-subtitle">喀纳斯湖｜深山景区</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">17°</span>/<span class="text-blue-300">3°</span></span>
+          <span>💧9%</span>
+          <span>🌬️8 km/h</span>
+          <span>🌅08:02 🌇19:42</span>
+        </div>
+        <div class="today-right">⛅ 9°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>⛅</div>
+          <div>3°/17°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>🌧️</div>
+          <div>2°/15°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>⛅</div>
+          <div>4°/16°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>🌧️</div>
+          <div>2°/14°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>⛅</div>
+          <div>3°/15°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>☀️</div>
+          <div>4°/16°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>🌧️</div>
+          <div>2°/14°</div>
+        </div>
+      </div>
+      <div class="tag-warning">⚠️ 山区低温，备好厚外套，留意降雪</div>
     </div>
 
+    <!-- 禾木 -->
     <div class="weather-card">
-      <span class="city-tag">景区</span>
-      <h3 class="text-xl font-bold">禾木</h3>
-      <p class="text-sm opacity-80">图瓦村落｜山区村落</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：晴间多云，气温 1℃ ~ 15℃</div>
-        <div class="text-amber-300 mt-1">⚠️ 夜间接近0℃，注意保暖</div>
+      <h3 class="text-2xl font-bold">禾木</h3>
+      <div class="weather-card-subtitle">图瓦村落｜深山村落</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">15°</span>/<span class="text-blue-300">1°</span></span>
+          <span>💧10%</span>
+          <span>🌬️7 km/h</span>
+          <span>🌅08:04 🌇19:40</span>
+        </div>
+        <div class="today-right">⛅ 7°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>⛅</div>
+          <div>1°/15°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>🌧️</div>
+          <div>0°/13°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>⛅</div>
+          <div>2°/14°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>🌧️</div>
+          <div>0°/12°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>⛅</div>
+          <div>1°/13°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>☀️</div>
+          <div>2°/14°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>🌧️</div>
+          <div>0°/12°</div>
+        </div>
+      </div>
+      <div class="tag-warning">⚠️ 夜间接近0℃，务必带薄羽绒</div>
     </div>
 
+    <!-- 阿勒泰 -->
     <div class="weather-card">
-      <span class="city-tag">终点</span>
-      <h3 class="text-xl font-bold">阿勒泰</h3>
-      <p class="text-sm opacity-80">阿禾公路终点</p>
-      <div class="mt-2 text-sm">
-        <div>近7天：晴到多云，气温 9℃ ~ 22℃</div>
-        <div class="text-amber-300 mt-1">⚠️ 阿禾公路关注临时管制</div>
+      <h3 class="text-2xl font-bold">阿勒泰</h3>
+      <div class="weather-card-subtitle">阿禾公路终点</div>
+      <div class="today-row">
+        <div class="today-left text-sm">
+          <span>今日 <span class="text-red-400">22°</span>/<span class="text-blue-300">9°</span></span>
+          <span>💧5%</span>
+          <span>🌬️11 km/h</span>
+          <span>🌅07:58 🌇19:46</span>
+        </div>
+        <div class="today-right">☀️ 16°</div>
       </div>
+      <div class="forecast-scroll">
+        <div class="forecast-item">
+          <div>周五</div>
+          <div>☀️</div>
+          <div>9°/22°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周六</div>
+          <div>⛅</div>
+          <div>10°/23°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周日</div>
+          <div>🌧️</div>
+          <div>8°/21°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周一</div>
+          <div>⛅</div>
+          <div>9°/20°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周二</div>
+          <div>☀️</div>
+          <div>10°/21°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周三</div>
+          <div>⛅</div>
+          <div>9°/22°</div>
+        </div>
+        <div class="forecast-item">
+          <div>周四</div>
+          <div>🌧️</div>
+          <div>8°/20°</div>
+        </div>
+      </div>
+      <div class="tag-warning">⚠️ 阿禾公路随时可能临时管制</div>
     </div>
   </div>
 
@@ -473,6 +899,32 @@ tailwind.config = {
     </div>
   </div>
 
+  <!-- ===================== 北疆备用路况查询渠道 ===================== -->
+  <div class="section">
+    <h2 class="text-lg font-bold text-primary mb-3">
+      <i class="fa fa-road mr-1"></i>北疆备用路况查询渠道
+    </h2>
+    <div class="tip-row">
+        <div class="font-semibold">🚓 新疆交警（微信公众号）</div>
+        <p class="text-sm text-gray-600 mt-1">每日早8点更新独库公路日报，唐布拉、那拉提山区降雪/临时封路权威通知。</p>
+    </div>
+    <div class="tip-row">
+        <div class="font-semibold">🛣️ 新e畅行（微信小程序）</div>
+        <p class="text-sm text-gray-600 mt-1">G30连霍高速（伊宁、赛湖、奎屯）实时高速路况、服务区、监控画面。</p>
+    </div>
+    <div class="tip-row">
+        <div class="font-semibold">🏞️ 游新疆一码游（小程序）</div>
+        <p class="text-sm text-gray-600 mt-1">喀纳斯、禾木景区道路公告 + 独库公路预约入口。</p>
+    </div>
+    <div class="tip-row">
+        <div class="font-semibold">📞 电话兜底（山区无信号可用）</div>
+        <p class="text-sm text-gray-600 mt-1">12122（高速路况）｜12328（全疆交通人工查询）</p>
+    </div>
+    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-3 text-sm text-amber-800">
+        ⚠️ 提示：小程序/公众号不支持网页内嵌，需要在微信手动打开；地图路况存在延迟，山区道路以交警、交通厅官方通告为准。
+    </div>
+  </div>
+
   <!-- ===================== 新疆路网官方公告 ===================== -->
   <div class="section">
     <h2 class="text-lg font-bold text-primary mb-3">
@@ -482,15 +934,15 @@ tailwind.config = {
     <div class="notice-box">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
         <div class="font-semibold text-warn">重点关注路段</div>
-        <button onclick="openXinjiangRoad()" class="bg-warn text-white px-3 py-1 rounded text-sm">
-          <i class="fa fa-external-link mr-1"></i> 打开新疆路网
-        </button>
+        <a href="https://cxfw.jtyst.xinjiang.gov.cn/" target="_blank" class="bg-warn text-white px-3 py-1 rounded text-sm">
+          <i class="fa fa-external-link mr-1"></i> 打开新疆路网官网
+        </a>
       </div>
       <p class="text-sm text-gray-700 leading-relaxed">
         独库公路、阿禾公路、G30连霍高速、G217、G3014及景区山区道路，可能因降雨、降雪、结冰或施工采取临时交通管制。
       </p>
       <p class="text-xs text-gray-500 mt-2">
-        💡 点击上方按钮查看官方实时路况；如弹窗无法加载，会自动改为新窗口打开。
+        💡 点击按钮，新开浏览器标签访问新疆交通厅路网，查看实时路况公告。
       </p>
     </div>
   </div>
@@ -498,19 +950,6 @@ tailwind.config = {
   <!-- ===================== 页脚 ===================== -->
   <div class="text-center text-xs text-gray-400 py-4">
     新疆自驾路况气象台 · 仅作行程参考 · 实际路况以官方公告为准
-  </div>
-
-  <!-- ===================== 新疆路网弹窗 ===================== -->
-  <div class="modal-mask" id="xinjiangRoadModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="font-semibold"><i class="fa fa-road mr-1"></i> 新疆路网</div>
-        <button onclick="closeXinjiangRoad()" class="text-white text-xl">×</button>
-      </div>
-      <div class="modal-body" id="xinjiangRoadBody">
-        <iframe id="xinjiangFrame" src="about:blank" referrerpolicy="no-referrer"></iframe>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -549,48 +988,8 @@ tailwind.config = {
 
     map.fitBounds(routePoints.map(p => [p[0], p[1]]), { padding: [40, 40] });
 
-    // ================= 新疆路网弹窗逻辑 =================
-    const XINJIANG_ROAD_URL = "https://cxfw.jtyst.xinjiang.gov.cn/";
-
-    function openXinjiangRoad() {
-      const modal = document.getElementById("xinjiangRoadModal");
-      const frame = document.getElementById("xinjiangFrame");
-      const body = document.getElementById("xinjiangRoadBody");
-
-      // 先尝试弹窗加载
-      frame.src = XINJIANG_ROAD_URL;
-      modal.classList.add("active");
-
-      // 10秒后检测是否空白，弹不出来就自动新窗口打开
-      setTimeout(() => {
-        try {
-          // 跨域页面无法读取真实内容，这里做兜底判断
-          if (frame.contentWindow && frame.contentWindow.document && frame.contentWindow.document.body) {
-            const html = frame.contentWindow.document.body.innerHTML;
-            if (!html || html.length < 50) {
-              fallbackToNewWindow();
-            }
-          }
-        } catch (e) {
-          // 跨域报错属于正常情况，直接走新窗口兜底
-          fallbackToNewWindow();
-        }
-      }, 10000);
-    }
-
-    function fallbackToNewWindow() {
-      const modal = document.getElementById("xinjiangRoadModal");
-      modal.classList.remove("active");
-      window.open(XINJIANG_ROAD_URL, "_blank");
-    }
-
-    function closeXinjiangRoad() {
-      document.getElementById("xinjiangRoadModal").classList.remove("active");
-      document.getElementById("xinjiangFrame").src = "about:blank";
-    }
-
     function refreshAll() {
-      alert("已刷新页面信息。\n新疆路网实时路况请点击“打开新疆路网”查看官方公告。");
+      alert("页面已刷新。\n新疆路网实时路况请点击按钮，新开标签访问官方网站。");
     }
   </script>
 </body>
