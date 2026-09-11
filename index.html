@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>北疆伊犁阿勒泰行程 | 9.26-10.5</title>
+    <title>北疆环线行程+实时天气 | 9.26-10.5</title>
     <style>
         * {
             margin: 0;
@@ -19,23 +19,53 @@
             max-width: 900px;
             margin: 0 auto;
         }
-        .header-card {
+        /* 天气头部卡片（和示例天气页面样式完全一致） */
+        .weather-card {
             background: linear-gradient(135deg, #50B8FE, #22A7F0);
             border-radius: 24px;
-            padding: 32px;
+            padding: 40px 30px;
             color: white;
             text-align: center;
             box-shadow: 0 10px 30px #0077cc44;
             margin-bottom:24px;
         }
-        .header-card h1 {
-            font-size:34px;
-            margin-bottom:10px;
+        .location {
+            font-size: 32px;
+            margin-bottom:12px;
         }
-        .header-card p {
-            font-size:18px;
+        .datetime {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom:24px;
+        }
+        .temperature {
+            font-size: 120px;
+            font-weight: 300;
+            line-height:1;
+        }
+        .weather-desc {
+            font-size: 36px;
+            margin:16px 0 40px;
+        }
+        .info-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap:20px;
+        }
+        .info-item {
+            background: rgba(255,255,255,0.18);
+            border-radius:20px;
+            padding:24px 10px;
+        }
+        .info-label {
+            font-size:20px;
             opacity:0.9;
         }
+        .info-value {
+            font-size:32px;
+            margin-top:8px;
+        }
+        /* 每日行程卡片 */
         .day-card {
             background: #fff;
             border-radius:20px;
@@ -74,11 +104,12 @@
 </head>
 <body>
     <div class="container">
-        <div class="header-card">
-            <h1>北疆环线行程</h1>
-            <p>9.26 - 10.05｜伊宁、赛里木湖、喀纳斯、禾木、那拉提</p>
+        <!-- 顶部实时天气模块 -->
+        <div class="weather-card">
+            <div id="weatherBox">加载天气中...</div>
         </div>
 
+        <!-- 北疆每日行程 -->
         <div class="day-card">
             <div class="day-title">周六 9.26｜宁波→伊宁</div>
             <div class="item"><span class="label">交通：</span>9C6875 7:20-15:20，飞行8h，落地办入住</div>
@@ -149,7 +180,55 @@
             <div class="item">【天界台】盘山步道登高望远；【游牧人家】骑马/越野车；【蛟龙出海】盘龙古道经典观景台；【卧牛谷】开阔山谷，森林牧场</div>
             <div class="stay">🏨 住宿：那拉提/伊宁</div>
         </div>
-
     </div>
+
+<script>
+const weatherBox = document.getElementById('weatherBox');
+// 修改城市：ningbo宁波，shenzhen深圳，yining伊宁，urumqi乌鲁木齐
+const city = "shenzhen";
+
+// 更新时间
+function updateTime() {
+    const week = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+    const d = new Date();
+    return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${week[d.getDay()]} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+async function loadWeather() {
+    try {
+        const res = await fetch(`https://wttr.in/${city}?format=j1`);
+        const data = await res.json();
+        const curr = data.current_condition[0];
+        const areaName = data.nearest_area[0].areaName[0].value;
+        const temp = curr.temp_C;
+        const weatherText = curr.weatherDesc[0].value;
+        const humidity = curr.humidity;
+        const wind = curr.windspeedKmph;
+
+        weatherBox.innerHTML = `
+            <div class="location">📍 ${areaName}</div>
+            <div class="datetime" id="timeText">${updateTime()}</div>
+            <div class="temperature">${temp}°C</div>
+            <div class="weather-desc">${weatherText}</div>
+            <div class="info-wrap">
+                <div class="info-item">
+                    <div class="info-label">湿度</div>
+                    <div class="info-value">${humidity}%</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">风速</div>
+                    <div class="info-value">${wind} km/h</div>
+                </div>
+            </div>
+        `;
+        setInterval(()=>{
+            document.getElementById("timeText").innerText = updateTime();
+        }, 1000);
+    }catch(err){
+        weatherBox.innerText="天气加载失败";
+    }
+}
+loadWeather();
+</script>
 </body>
 </html>
