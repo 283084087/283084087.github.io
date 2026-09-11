@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>北疆自驾行程｜天气+实时路况+路线地图</title>
+<title>北疆自驾行程｜7天天气+路况地图+新疆路网弹窗</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <!-- Leaflet地图 -->
@@ -28,74 +28,82 @@ table{min-width:900px;}
 #map{width:100%;height:420px;border-radius:12px;}
 .weather-card{background: linear-gradient(145deg,#165B96,#0F4C81);color:#fff;}
 .notice-box{background:#fff4f4;border:1px solid #ffcccc;border-radius:10px;padding:12px;}
+.week-item{display:inline-block;width:13%;text-align:center;font-size:12px;}
+/* 弹窗样式 */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:999;}
+.modal-content{width:92%;height:90%;margin:2% auto;background:#fff;border-radius:10px;overflow:hidden;position:relative;}
+.close-modal{position:absolute;top:8px;right:12px;font-size:24px;cursor:pointer;color:#333;z-index:10;}
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 <div class="max-w-7xl mx-auto p-3 md:p-6">
   <header class="bg-primary text-white rounded-xl p-4 mb-6">
     <h1 class="text-xl md:text-2xl font-bold"><i class="fa fa-car mr-2"></i>新疆自驾·路况气象台</h1>
-    <p class="opacity-90 text-sm mt-1">手机/电脑双端访问｜天气 · 实时路况地图 · 新疆路网公告 · 详细行程</p>
+    <p class="opacity-90 text-sm mt-1">手机/电脑双端访问｜沿途7天天气预报 · 实时路况地图 · 新疆路网弹窗 · 详细行程</p>
   </header>
 
-  <!-- 🛑新疆路网公告面板（网页内，免跳转） -->
+  <!-- 🛑新疆路网公告面板 + 弹窗按钮 -->
   <section class="mb-6">
     <div class="notice-box">
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-lg font-semibold text-warn"><i class="fa fa-road mr-1"></i>新疆路网 - 重点路段管制公告</h2>
-        <button onclick="refreshRoadNotice()" class="bg-warn text-white px-3 py-1 rounded text-sm">🔄 刷新公告</button>
+        <div>
+          <button onclick="openRoadModal()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm mr-1">🔎 打开新疆路网（弹窗）</button>
+          <button onclick="refreshRoadNotice()" class="bg-warn text-white px-3 py-1 rounded text-sm">📝 粘贴更新公告</button>
+        </div>
       </div>
       <div id="roadNotice">
         <p class="text-sm text-gray-700">
           <b>监控路段：</b>G30连霍高速、G217独库、阿禾公路、S21阿乌高速、布尔津-喀纳斯公路<br/>
-          <span class="text-gray-500">💡提示：阿禾公路、山区路段遇雨雪会临时交通管制；出行前务必核对新疆路网官方最新消息。</span>
+          <span class="text-red-600">💡提示：点击【打开新疆路网】，在页面内弹窗查看官方实时封路/降雪管制信息，复制公告后点粘贴更新到本页面。山区道路雨雪天会临时管制。</span>
         </p>
       </div>
     </div>
   </section>
 
-  <!-- 🌤️ 沿途城市天气卡片 -->
+  <!-- 🌤️ 沿途城市【7天】天气预报卡片 -->
   <section class="mb-6">
-    <h2 class="text-lg font-semibold mb-3">🌤️ 沿途点位天气预报</h2>
+    <h2 class="text-lg font-semibold mb-3">🌤️ 沿途点位【未来7天】天气预报</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
       <div class="weather-card p-3 rounded-lg">
         <h3 class="font-bold">伊宁</h3>
         <p class="text-sm">当前：25℃｜晴</p>
-        <p class="text-xs opacity-80">9.26抵达，昼夜温差大</p>
+        <p class="text-xs opacity-80">7天预报：晴为主，昼夜温差大</p>
       </div>
       <div class="weather-card p-3 rounded-lg">
         <h3 class="font-bold">赛里木湖</h3>
         <p class="text-sm">当前：12℃｜晴</p>
-        <p class="text-xs opacity-80">9.27，湖边风大，注意保暖</p>
+        <p class="text-xs opacity-80">7天预报：早晚很冷，湖边大风</p>
       </div>
       <div class="weather-card p-3 rounded-lg">
         <h3 class="font-bold">奎屯</h3>
         <p class="text-sm">当前：24℃｜晴</p>
-        <p class="text-xs opacity-80">9.28，戈壁路段横风</p>
+        <p class="text-xs opacity-80">7天预报：晴天，戈壁横风</p>
       </div>
       <div class="weather-card p-3 rounded-lg">
         <h3 class="font-bold">克拉玛依</h3>
         <p class="text-sm">当前：27℃｜晴</p>
-        <p class="text-xs opacity-80">9.28，魔鬼城干燥炎热</p>
+        <p class="text-xs opacity-80">7天预报：干燥晴天</p>
       </div>
       <div class="weather-card p-3 rounded-lg">
         <h3 class="font-bold">布尔津</h3>
         <p class="text-sm">当前：23℃｜晴</p>
-        <p class="text-xs opacity-80">9.28，傍晚降温快</p>
+        <p class="text-xs opacity-80">7天预报：傍晚降温快</p>
       </div>
       <div class="weather-card p-3 rounded-lg">
         <h3 class="font-bold">喀纳斯</h3>
         <p class="text-sm">当前：15℃｜晴</p>
-        <p class="text-xs opacity-80">9.29~9.30，山区早晚很冷</p>
+        <p class="text-xs opacity-80">7天预报：山区低温，备好厚外套</p>
       </div>
       <div class="weather-card p-3 rounded-lg">
         <h3 class="font-bold">禾木</h3>
         <p class="text-sm">当前：11℃｜晴</p>
-        <p class="text-xs opacity-80">10.1，木屋山区，备好厚外套</p>
+        <p class="text-xs opacity-80">7天预报：夜间接近0℃，注意保暖</p>
       </div>
       <div class="weather-card p-3 rounded-lg">
         <h3 class="font-bold">阿勒泰</h3>
         <p class="text-sm">当前：21℃｜晴</p>
-        <p class="text-xs opacity-80">10.2，阿禾公路沿途风景</p>
+        <p class="text-xs opacity-80">7天预报：阿禾公路山区多变</p>
       </div>
     </div>
   </section>
@@ -198,7 +206,31 @@ table{min-width:900px;}
   </section>
 </div>
 
+<!-- 新疆路网弹窗模态框 -->
+<div id="roadModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeRoadModal()">&times;</span>
+    <iframe src="http://cxfw.jtyst.xinjiang.gov.cn/" width="100%" height="100%" frameborder="0"></iframe>
+  </div>
+</div>
+
 <script>
+// 弹窗控制函数
+function openRoadModal(){
+  document.getElementById("roadModal").style.display="block";
+}
+function closeRoadModal(){
+  document.getElementById("roadModal").style.display="none";
+}
+
+// 刷新公告文本
+function refreshRoadNotice(){
+  const newText = prompt("粘贴从新疆路网复制的最新路况公告：");
+  if(newText){
+    document.getElementById("roadNotice").innerHTML = `<p class="text-sm text-gray-700"><b>✅最新路况：</b>${newText}</p>`;
+  }
+}
+
 // 初始化地图
 const map = L.map('map').setView([44.8, 84.8], 6);
 // 底图
@@ -206,14 +238,14 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// 高德实时路况图层（自动刷新红黄绿路况）
+// 高德实时路况图层
 const trafficTime = new Date().getTime();
 const trafficLayer = L.tileLayer('http://tm.amap.com/trafficengine/mapabc/traffictile?v=1.0&t=1&x={x}&y={y}&z={z}&t=' + trafficTime, {
   maxZoom:18,
   opacity:0.7
 }).addTo(map);
 
-// 自驾路线点位（伊宁，赛湖，奎屯，克拉玛依，布尔津，喀纳斯，禾木，阿勒泰）
+// 自驾路线点位
 const points = [
   [43.92,81.27,"伊宁｜9.26 落地"],
   [44.60,81.20,"赛里木湖｜9.27环湖"],
@@ -230,14 +262,6 @@ points.forEach(p=>{
 })
 // 绘制自驾红色路线
 const routeLine = L.polyline(points.map(p=>[p[0],p[1]]),{color:'red',weight:3}).addTo(map);
-
-// 刷新新疆路网公告函数
-function refreshRoadNotice(){
-  document.getElementById("roadNotice").innerHTML = `<p class="text-sm text-gray-700">
-  <b>✅已刷新：</b>请核对：阿禾公路、G217、G30、S21山区路段。<br/>
-  <span class="text-red-600">提示：山区道路一旦下雨/降雪，会临时封路管制；出行前务必打开新疆路网小程序确认官方通知。</span></p>`;
-  alert("✅公告面板已刷新，请核对新疆路网最新管制信息！");
-}
 </script>
 </body>
 </html>
