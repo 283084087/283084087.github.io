@@ -17,6 +17,108 @@ body{
   padding:16px;
 }
 
+/* ========== 多地点天气卡片 样式 ========== */
+.place-weather-card{
+  background:#182433;
+  border-radius:16px;
+  overflow:hidden;
+  margin-bottom:16px;
+}
+.card-banner{
+  height:140px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0.75), #182433), #345;
+}
+.place-name{
+  font-size:32px;
+  font-weight:bold;
+  margin-bottom:4px;
+}
+.place-desc{
+  font-size:14px;
+  opacity:0.85;
+}
+.weather-main-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 20px;
+}
+.weather-left{
+  display:flex;
+  gap:12px;
+  font-size:14px;
+  flex-wrap:wrap;
+  opacity:0.9;
+}
+.weather-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.temp-big{
+  font-size:44px;
+  font-weight:bold;
+}
+/* 7天横向预报 */
+.week-forecast{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+  padding:0 10px 14px;
+  text-align:center;
+  font-size:13px;
+}
+.forecast-item .icon{
+  font-size:20px;
+  margin:4px 0;
+}
+.bottom-tip{
+  margin:0 20px 20px;
+  padding:8px 12px;
+  background:#289b49;
+  border-radius:8px;
+  font-size:14px;
+}
+
+/* ========== 新增：路段里程耗时卡片【匹配你截图样式】 ========== */
+.route-section-wrap{
+  margin:20px 0;
+}
+.route-section-title{
+  font-size:16px;
+  font-weight:bold;
+  margin-bottom:12px;
+}
+.route-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+.route-item-card{
+  background:#182433;
+  border-radius:14px;
+  padding:16px;
+}
+.route-name{
+  font-size:24px;
+  font-weight:500;
+  margin-bottom:8px;
+}
+.route-distance{
+  font-size:22px;
+  color:#40a9ff;
+  font-weight:bold;
+}
+@media(max-width:720px){
+  .route-grid{
+    grid-template-columns:1fr;
+  }
+}
+
 /* 顶部行程标题条 */
 .route-top-bar{
   background:rgba(255,200,80,0.15);
@@ -122,6 +224,358 @@ body{
 </style>
 </head>
 <body>
+
+<!-- 1.伊宁天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">伊宁</div>
+    <div class="place-desc">伊犁河谷，早晚温差大</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 24°/11°</span>
+      <span>💧30%</span>
+      <span>💨10 km/h</span>
+      <span>🌅07:20</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">☀️</span>
+      <div class="temp-big">23°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>10°24°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">⛅</div><div>11°23°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">☁️</div><div>9°21°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>8°20°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>8°19°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>7°17°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">🌧️</div><div>6°15°</div></div>
+  </div>
+  <div class="bottom-tip">✅ 本10天无降雪预报</div>
+</div>
+
+<!-- 2.赛里木湖天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">赛里木湖</div>
+    <div class="place-desc">高海拔·环湖风大</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 17°/8°</span>
+      <span>💧 2%</span>
+      <span>💨 14 km/h</span>
+      <span>🌅 08:08</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">☀️</span>
+      <div class="temp-big">17°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>8° 17°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">⛅</div><div>9° 20°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>10° 20°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>12° 19°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>12° 18°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>11° 15°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">🌥️</div><div>8° 14°</div></div>
+  </div>
+  <div class="bottom-tip">✅ 本10天无降雪预报</div>
+</div>
+
+<!--3.奎屯天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">奎屯</div>
+    <div class="place-desc">G30/G3014交汇</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 29°/15°</span>
+      <span>💧 0%</span>
+      <span>💨 9 km/h</span>
+      <span>🌅 07:54</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">☀️</span>
+      <div class="temp-big">28°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>15° 29°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">☀️</div><div>18° 31°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">☁️</div><div>17° 33°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">☁️</div><div>22° 32°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">☀️</div><div>21° 34°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>20° 29°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">☁️</div><div>18° 27°</div></div>
+  </div>
+</div>
+
+<!--4.克拉玛依天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">克拉玛依</div>
+    <div class="place-desc">戈壁路段，横风多发</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 30°/16°</span>
+      <span>💧4%</span>
+      <span>💨22 km/h</span>
+      <span>🌅07:48</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">☀️</span>
+      <div class="temp-big">29°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>16°30°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">☀️</div><div>17°32°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">⛅</div><div>15°29°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">☁️</div><div>14°27°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">☀️</div><div>14°28°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>13°26°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">☁️</div><div>12°24°</div></div>
+  </div>
+</div>
+
+<!--5.布尔津天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">布尔津</div>
+    <div class="place-desc">额尔齐斯河，昼夜温差极大</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 26°/9°</span>
+      <span>💧12%</span>
+      <span>💨11 km/h</span>
+      <span>🌅07:35</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">☀️</span>
+      <div class="temp-big">24°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>9°26°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">⛅</div><div>8°24°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">☁️</div><div>7°22°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>7°20°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>6°19°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>6°17°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">🌧️</div><div>5°15°</div></div>
+  </div>
+</div>
+
+<!--6.喀纳斯天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">喀纳斯</div>
+    <div class="place-desc">山区林区，低温易雨雪</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 19°/4°</span>
+      <span>💧35%</span>
+      <span>💨7 km/h</span>
+      <span>🌅07:22</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">⛅</span>
+      <div class="temp-big">16°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">⛅</div><div>4°19°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">☁️</div><div>3°17°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>2°14°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">🌧️</div><div>2°12°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>1°11°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>0°9°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">❄️</div><div>-1°7°</div></div>
+  </div>
+  <div class="bottom-tip">⚠️ 未来10天有降雪风险</div>
+</div>
+
+<!--7.白哈巴天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">白哈巴</div>
+    <div class="place-desc">西北第一村，气温更低</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 17°/2°</span>
+      <span>💧40%</span>
+      <span>💨6 km/h</span>
+      <span>🌅07:20</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">⛅</span>
+      <div class="temp-big">14°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">⛅</div><div>2°17°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">☁️</div><div>1°15°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>0°12°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">🌧️</div><div>-1°10°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>-2°9°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>-3°7°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">❄️</div><div>-4°5°</div></div>
+  </div>
+  <div class="bottom-tip">⚠️ 未来10天有降雪风险</div>
+</div>
+
+<!--8.禾木天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">禾木</div>
+    <div class="place-desc">山间村落，清晨易霜冻</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 18°/3°</span>
+      <span>💧38%</span>
+      <span>💨8 km/h</span>
+      <span>🌅07:24</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">⛅</span>
+      <div class="temp-big">15°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">⛅</div><div>3°18°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">☁️</div><div>2°16°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>1°13°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">🌧️</div><div>0°11°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>-1°10°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>-2°8°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">❄️</div><div>-3°6°</div></div>
+  </div>
+  <div class="bottom-tip">⚠️ 未来10天有降雪风险</div>
+</div>
+
+<!--9.阿勒泰天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">阿勒泰</div>
+    <div class="place-desc">阿勒泰市，阿禾公路起点</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 22°/6°</span>
+      <span>💧28%</span>
+      <span>💨9 km/h</span>
+      <span>🌅07:26</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">☀️</span>
+      <div class="temp-big">20°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">☀️</div><div>6°22°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">⛅</div><div>5°20°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">☁️</div><div>4°18°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>3°16°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>2°14°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>1°12°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">🌧️</div><div>0°10°</div></div>
+  </div>
+</div>
+
+<!--10.那拉提天气卡片 -->
+<div class="place-weather-card">
+  <div class="card-banner">
+    <div class="place-name">那拉提</div>
+    <div class="place-desc">空中草原，山区多变天气</div>
+  </div>
+  <div class="weather-main-row">
+    <div class="weather-left">
+      <span>今日 21°/7°</span>
+      <span>💧32%</span>
+      <span>💨12 km/h</span>
+      <span>🌅07:35</span>
+    </div>
+    <div class="weather-right">
+      <span style="font-size:32px;">⛅</span>
+      <div class="temp-big">19°</div>
+      <span>当前</span>
+    </div>
+  </div>
+  <div class="week-forecast">
+    <div class="forecast-item"><div>11(五)</div><div class="icon">⛅</div><div>7°21°</div></div>
+    <div class="forecast-item"><div>12(六)</div><div class="icon">☁️</div><div>6°19°</div></div>
+    <div class="forecast-item"><div>13(日)</div><div class="icon">🌧️</div><div>5°17°</div></div>
+    <div class="forecast-item"><div>14(一)</div><div class="icon">🌥️</div><div>4°16°</div></div>
+    <div class="forecast-item"><div>15(二)</div><div class="icon">🌥️</div><div>4°15°</div></div>
+    <div class="forecast-item"><div>16(三)</div><div class="icon">☁️</div><div>3°13°</div></div>
+    <div class="forecast-item"><div>17(四)</div><div class="icon">🌧️</div><div>2°11°</div></div>
+  </div>
+</div>
+
+<!-- ========== 新增：路段里程耗时卡片组 ========== -->
+<div class="route-section-wrap">
+  <div class="route-section-title">🗺️ 分段里程与预估行车时间</div>
+  <div class="route-grid">
+    <div class="route-item-card">
+      <div class="route-name">1.伊宁→赛里木湖</div>
+      <div class="route-distance">≈150km · 2.0h（估）</div>
+    </div>
+    <div class="route-item-card">
+      <div class="route-name">2.赛里木湖→奎屯</div>
+      <div class="route-distance">≈240km · 3.0h（估）</div>
+    </div>
+    <div class="route-item-card">
+      <div class="route-name">3.奎屯→克拉玛依</div>
+      <div class="route-distance">≈150km · 2.0h（估）</div>
+    </div>
+    <div class="route-item-card">
+      <div class="route-name">4.克拉玛依→布尔津</div>
+      <div class="route-distance">≈320km · 4.0h（估）</div>
+    </div>
+    <div class="route-item-card">
+      <div class="route-name">5.布尔津→喀纳斯</div>
+      <div class="route-distance">≈140km · 3.0h（估）</div>
+    </div>
+    <div class="route-item-card">
+      <div class="route-name">6.喀纳斯→禾木</div>
+      <div class="route-distance">≈60km · 1.5h（估）</div>
+    </div>
+    <div class="route-item-card">
+      <div class="route-name">7.禾木→阿勒泰市</div>
+      <div class="route-distance">≈120km · 2.5h（估）</div>
+    </div>
+    <div class="route-item-card">
+      <div class="route-name">8.阿勒泰市→那拉提</div>
+      <div class="route-distance">≈580km ·7.0h（估）</div>
+    </div>
+    <div class="route-item-card">
+      <div class="route-name">9.那拉提→伊宁</div>
+      <div class="route-distance">≈260km ·4.0h（估）</div>
+    </div>
+    <div class="route-item-card">
+      <div class="route-name">10.喀纳斯→白哈巴</div>
+      <div class="route-distance">≈28km ·1.0h（估）</div>
+    </div>
+  </div>
+</div>
 
 <!-- 顶部行程总览标签 -->
 <div class="route-top-bar">
