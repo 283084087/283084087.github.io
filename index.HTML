@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<!-- 手机端核心：禁止缩放，适配屏幕宽度 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>新疆自驾 · 路况气象台</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;}
+body{background:#f3f4f6;color:#222;padding-bottom:20px;}
+.header{background:#0f3460;color:#fff;padding:14px;position:sticky;top:0;z-index:100;}
+.header h1{font-size:20px;margin-bottom:6px;}
+.header-desc{opacity:0.9;font-size:13px;margin-bottom:10px;word-break:break-all;}
+.header-buttons{display:flex;gap:8px;}
+.header-buttons button{padding:8px 10px;border:none;border-radius:6px;background:#ffffff33;color:#fff;font-size:14px;cursor:pointer;}
+.container{max-width:900px;margin:0 auto;padding:10px;}
+.card{background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px #0000001a;}
+.card-dark{background:#0f172a;color:#f8fafc;border-radius:12px;padding:12px;margin-bottom:10px;}
+.card-title{font-size:17px;font-weight:bold;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.card-sub{font-size:13px;opacity:0.8;margin-bottom:12px;}
+.road-item{padding:8px;border-left:4px #22c55e solid;background:#f0fdf4;border-radius:0 6px 6px 0;margin-bottom:8px;font-size:14px;}
+.risk-warning{background:#fffbeb;border-left:4px #f59e0b solid;padding:10px;border-radius:0 8px 8px 0;margin:10px 0;font-size:14px;}
+.weather-grid{display:grid;gap:10px;}
+.point-card{background:#1e293b;border-radius:10px;padding:12px;color:#f8fafc;}
+.point-name{font-size:18px;font-weight:bold;margin-bottom:4px;}
+.point-desc{font-size:12px;opacity:0.7;margin-bottom:8px;}
+.current-weather{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.current-left div{font-size:14px;margin:3px 0;}
+.current-right{font-size:28px;font-weight:bold;}
+.forecast-row{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin:8px 0;}
+.forecast-day{text-align:center;font-size:11px;}
+.snow-tip{background:#22c55e22;color:#86efac;padding:4px 6px;border-radius:6px;font-size:12px;display:inline-block;margin-top:6px;}
+#map{width:100%;height:320px;border-radius:10px;margin:8px 0;}
+.map-tip{text-align:center;font-size:13px;color:#475569;padding:4px;}
+.info-block{font-size:14px;line-height:1.6;}
+.info-block h4{margin:8px 0 4px;}
+/* 备用渠道卡片样式 */
+.channel-card{background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px #0000001a;}
+.channel-title{font-size:17px;font-weight:bold;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.channel-item{display:flex;gap:10px;padding:10px;border-radius:10px;background:#f8fafc;margin-bottom:8px;border:1px solid #eef2f7;align-items:flex-start;}
+.channel-icon{width:36px;height:36px;border-radius:10px;background:#eef4ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.channel-body .channel-name{font-size:15px;font-weight:bold;color:#0f3460;margin-bottom:3px;}
+.channel-body .channel-desc{font-size:12px;color:#475569;line-height:1.5;}
+.channel-phone{margin-top:8px;padding:10px;background:#fff7ed;border-left:4px #f59e0b solid;border-radius:0 8px 8px 0;font-size:13px;color:#78350f;}
+.channel-phone strong{color:#b91c1c;}
+/* ==========手机端专属适配========== */
+@media (max-width: 600px){
+    .forecast-row{grid-template-columns:repeat(5,1fr);row-gap:6px;}
+    .header h1{font-size:18px;}
+    .header-desc{font-size:12px;}
+    .current-right{font-size:24px;}
+    #map{height:280px !important;}
+    .container{padding:8px;}
+}
+</style>
+</head>
+<body>
+<div class="header">
+    <h1>🚗 新疆自驾 · 路况气象台</h1>
+    <div class="header-desc">伊宁 → 赛里木湖 → 奎屯 → 布尔津 → 白哈巴 → 喀纳斯 → 禾木 → 返回布尔津 → 返回奎屯 → 独库公路 → 唐布拉 → 那拉提 → 返回伊宁</div>
+    <div class="header-buttons">
+        <button onclick="refreshAll()">刷新天气与路况</button>
+    </div>
+</div>
+<div class="container">
+    <div class="card">
+        <div class="card-title">🛣️ 途经道路速览</div>
+        <div class="road-item">伊宁 — 赛里木湖（G30连霍高速，果子沟路段多弯道，注意横风）</div>
+        <div class="road-item">赛里木湖 — 奎屯（G30连霍高速，戈壁路段，注意疲劳驾驶）</div>
+        <div class="road-item">奎屯 — 布尔津（G3014+G217，长途自驾，中途预留休息）</div>
+        <div class="road-item">布尔津 — 白哈巴 — 喀纳斯 — 禾木（山区道路，弯道多，气温变化快）</div>
+        <div class="road-item">禾木 → 返回布尔津 → 返回奎屯 → 独库公路（关注山区降雪与临时封路）</div>
+        <div class="road-item">独库公路 → 唐布拉 → 那拉提 → 返回伊宁</div>
+    </div>
+    <div class="risk-warning">
+        <strong>⚠️ 出行风险速报</strong>
+        <p>北疆山区（白哈巴、喀纳斯、禾木、独库、唐布拉）气温偏低，阵雨、降温甚至初雪都可能出现；出发前请确认景区预约、边防证及道路管制信息。</p>
+    </div>
+    <div class="card-dark">
+        <div class="card-title">📍 途经点 · 预报（今日+未来9天）</div>
+        <div class="weather-grid" id="weatherContainer"></div>
+    </div>
+    <div class="card">
+        <div class="card-title">🗺️ 自驾路线地图（红黄绿实时路况）</div>
+        <div id="map"></div>
+        <div class="map-tip">提示：新疆山区部分道路无路况采集，可能不显示红黄绿路况颜色；高速与城市周边道路更易显示实时路况。</div>
+    </div>
+    <!-- 北疆备用路况查询渠道 -->
+    <div class="channel-card">
+        <div class="channel-title">📡 北疆备用路况查询渠道</div>
+        <div class="channel-item">
+            <div class="channel-icon">🚗</div>
+            <div class="channel-body">
+                <div class="channel-name">新疆交警（微信公众号）</div>
+                <div class="channel-desc">每日早8点更新独库公路日报，唐布拉、那拉提山区降雪/临时封路权威通知。</div>
+            </div>
+        </div>
+        <div class="channel-item">
+            <div class="channel-icon">🗺️</div>
+            <div class="channel-body">
+                <div class="channel-name">新e畅行（微信小程序）</div>
+                <div class="channel-desc">G30连霍高速（伊宁、赛里木、奎屯）实时高速路况、服务区、监控画面。</div>
+            </div>
+        </div>
+        <div class="channel-item">
+            <div class="channel-icon">🏔️</div>
+            <div class="channel-body">
+                <div class="channel-name">游新疆一码游（小程序）</div>
+                <div class="channel-desc">喀纳斯、禾木景区道路公告 + 独库公路预约入口。</div>
+            </div>
+        </div>
+        <div class="channel-phone">
+            <strong>电话兜底（山区无信号可用）</strong><br>
+            12122（高速路况）| 12328（全疆交通人工查询）
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title">📋 出行提示</div>
+        <div class="info-block">
+            <h4>🏔️ 出行参考</h4>
+            <p>北疆昼夜温差大，山区早晚温度低，建议携带厚外套、防滑鞋和车载充电器。山区道路随时可能临时交通管制，出发前以官方公告为准。</p>
+            <h4>🎫 景区预约参考</h4>
+            <p>赛里木湖、喀纳斯、白哈巴、禾木建议提前预约；白哈巴需确认边防证办理要求。</p>
+            <h4>ℹ️ 数据说明</h4>
+            <p>天气数据来源 Open-Meteo，仅作出行参考；地图实时路况基于高德路况瓦片，红黄绿分别代表畅通、缓行、拥堵。</p>
+        </div>
+    </div>
+</div>
+<script>
+// 途经点位，和你的自驾路线一一对应
+const points = [
+    {name:"伊宁",desc:"行程起点，G30果子沟入口",lat:43.91,lon:81.26},
+    {name:"赛里木湖",desc:"高海拔·环湖风大",lat:44.60,lon:81.20},
+    {name:"奎屯",desc:"G30/G3014交汇",lat:44.42,lon:84.90},
+    {name:"布尔津",desc:"喀纳斯方向门户",lat:47.70,lon:86.85},
+    {name:"白哈巴",desc:"边境村落，需要边防证",lat:48.67,lon:85.60},
+    {name:"喀纳斯",desc:"高海拔湖区·需换乘区间车",lat:48.12,lon:86.99},
+    {name:"禾木",desc:"阿禾公路·图瓦村落",lat:48.42,lon:87.42},
+    {name:"唐布拉",desc:"独库公路北段草原",lat:43.57,lon:84.50},
+    {name:"那拉提",desc:"空中草原，独库公路南段",lat:43.47,lon:84.00}
+];
+
+// 初始化Leaflet地图
+const map = L.map('map').setView([45,84],5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// 在地图上标记所有点位
+points.forEach(p=>{
+    L.marker([p.lat,p.lon]).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.desc}`);
+});
+
+// 绘制自驾路线连线
+const routeLatLng = [
+    [43.91,81.26], //伊宁
+    [44.60,81.20], //赛里木湖
+    [44.42,84.90], //奎屯
+    [47.70,86.85], //布尔津
+    [48.67,85.60], //白哈巴
+    [48.12,86.99], //喀纳斯
+    [48.42,87.42], //禾木
+    [47.70,86.85], //布尔津
+    [44.42,84.90], //奎屯
+    [43.57,84.50], //唐布拉
+    [43.47,84.00], //那拉提
+    [43.91,81.26]  //返回伊宁
+];
+L.polyline(routeLatLng,{color:"#ef4444",weight:3}).addTo(map);
+
+// 渲染天气卡片容器
+function renderWeatherCards(){
+    const container = document.getElementById("weatherContainer");
+    container.innerHTML = "";
+    points.forEach(p=>{
+        const div = document.createElement("div");
+        div.className = "point-card";
+        div.innerHTML = `
+            <div class="point-name">${p.name}</div>
+            <div class="point-desc">${p.desc}</div>
+            <div class="current-weather">
+                <div class="current-left">
+                    <div>今日：--/-- ℃</div>
+                    <div>💧降水：--%  🌬️风速：-- km/h</div>
+                    <div>🌅日出 --:--  🌇日落 --:--</div>
+                </div>
+                <div class="current-right">--°</div>
+            </div>
+            <div class="forecast-row">
+                <div class="forecast-day">11(五)<br>☀️<br>--/--</div>
+                <div class="forecast-day">12(六)<br>☀️<br>--/--</div>
+                <div class="forecast-day">13(日)<br>🌧️<br>--/--</div>
+                <div class="forecast-day">14(一)<br>⛅<br>--/--</div>
+                <div class="forecast-day">15(二)<br>⛅<br>--/--</div>
+                <div class="forecast-day">16(三)<br>⛅<br>--/--</div>
+                <div class="forecast-day">17(四)<br>🌧️<br>--/--</div>
+                <div class="forecast-day">18(五)<br>⛅<br>--/--</div>
+                <div class="forecast-day">19(六)<br>☀️<br>--/--</div>
+                <div class="forecast-day">20(日)<br>☀️<br>--/--</div>
+            </div>
+            <div class="snow-tip">✅本10天无降雪预报</div>
+        `;
+        container.appendChild(div);
+    })
+}
+
+// 刷新函数，后续对接Open-Meteo天气接口
+function refreshAll(){
+    alert("正在拉取Open-Meteo天气数据，刷新点位预报");
+    renderWeatherCards();
+}
+
+// 页面加载初始化
+window.onload = function(){
+    renderWeatherCards();
+}
+</script>
+</body>
+</html>
